@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="card shadow-sm" style="background-color: #fffde7; border-left: 5px solid #fbc02d;">
+        <div class="card-body">
+            <h2 class="text-center mb-4">Detalles de solicitud de aprobación</h2>
+            
+            <h5 class="text-muted border-bottom pb-2">Documento</h5>
+            <p><strong>Nombre del documento:</strong> {{ solicitud.nombreDocumento }}</p>
+            <p><strong>No. Revisión:</strong> {{ solicitud.numeroRevision }}</p>
+            
+            <div class="mt-4">
+                <h5 class="text-muted">Lista de documentos</h5>
+                <a href="{{ solicitud.linkSharepoint }}" target="_blank" class="btn btn-link text-primary p-0">
+                    <i class="bi bi-file-earmark-pdf"></i> Ver en SharePoint
+                </a>
+            </div>
+
+            <div class="mt-4">
+                <h5 class="text-muted border-bottom pb-2">Datos del originador</h5>
+                <p><strong>Nombre:</strong> {{ solicitud.originador.email }}</p> {# Puedes cambiarlo por nombre_completo si lo tienes #}
+            </div>
+
+            <div class="mt-4">
+                <h5 class="text-muted border-bottom pb-2">Lista de aprobadores</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-borderless">
+                        <thead>
+                            <tr>
+                                <th>Nombre/Correo</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {# Aquí recorreremos la relación con aprobadores más adelante #}
+                            {% for aprobador in solicitud.aprobadores %}
+                                <tr>
+                                    <td>{{ aprobador.email }}</td>
+                                    <td><span class="badge bg-secondary">Pendiente</span></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="{{ path('app_origin_historial') }}" class="btn btn-outline-dark">Volver al historial</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

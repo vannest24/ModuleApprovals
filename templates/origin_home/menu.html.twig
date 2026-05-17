@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-5 text-center">
+    <h1 class="mb-4">Panel de Originador DCR</h1>
+    <div class="row justify-content-center gap-4">
+        <a href="{{ path('app_origin_nuevo') }}" class="col-md-5 btn btn-warning p-5 shadow">
+            <i class="bi bi-plus-square fs-1"></i>
+            <h3 class="mt-2">Nueva Solicitud</h3>
+        </a>
+        <a href="{{ path('app_origin_historial') }}" class="col-md-5 btn btn-primary p-5 shadow">
+            <i class="bi bi-list-check fs-1"></i>
+            <h3 class="mt-2">Ver Historial</h3>
+        </a>
+    </div>
+</div>
+{% endblock %}

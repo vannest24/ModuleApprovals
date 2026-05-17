@@ -13,40 +13,75 @@ use App\Enum\Estatus;
 
 final class OriginHomeController extends AbstractController
 {
-#[Route('/origin/home', name: 'app_origin_home')]
-public function index(Request $request, EntityManagerInterface $entityManager): Response
-{
-    // 1. Creamos una nueva instancia de la entidad
-    $solicitud = new SolicitudesDcr();
-    
-    // 2. Creamos el formulario basado en el Type que ya diseñamos
-    $form = $this->createForm(SolicitudType::class, $solicitud);
-    
-    // 3. Le decimos al formulario que revise si viene información en el Request
-    $form->handleRequest($request);
-
-    // 4. Si el formulario fue enviado y es válido (pasa las reglas de Harman)
-    if ($form->isSubmitted() && $form->isValid()) {
-        
-        // 1. Asignar el usuario logueado como originador
-        $solicitud->setOriginador($this->getUser());
-
-        // 2. Asignar la fecha de creación actual
-       $solicitud->setFechaCreacion(new \DateTimeImmutable());
-
-        // 3. Asignar el estatus por defecto
-        $solicitud->setEstatus(Estatus::ABIERTA);
-
-        $entityManager->persist($solicitud);
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Solicitud creada correctamente.');
-        return $this->redirectToRoute('app_origin_home');
+    /**
+     * PANTALLA PRINCIPAL: Los dos botones (Menú)
+     */
+    #[Route('/origin/home', name: 'app_origin_home')]
+    public function index(): Response
+    {
+        return $this->render('origin_home/menu.html.twig');
     }
 
-    // 5. Pasamos el formulario a la vista de Twig
-    return $this->render('origin_home/index.html.twig', [
-        'form' => $form->createView(),
+    /**
+     * FORMULARIO: Crear nueva solicitud
+     */
+    #[Route('/origin/nuevo', name: 'app_origin_nuevo')]
+    public function nuevo(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $solicitud = new SolicitudesDcr();
+        $form = $this->createForm(SolicitudType::class, $solicitud);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Asignación de datos automáticos
+            $solicitud->setOriginador($this->getUser());
+            $solicitud->setFechaCreacion(new \DateTimeImmutable());
+            
+            // IMPORTANTE: Asegúrate que en tu Enum sea ABIERTO (o como lo definiste)
+            $solicitud->setEstatus(Estatus::ABIERTA); 
+
+            $entityManager->persist($solicitud);
+            $entityManager->flush();
+
+            $this->addFlash('success', '¡Solicitud DCR creada con éxito!');
+            
+            // Después de crear, lo mandamos al historial para que vea su registro
+            return $this->redirectToRoute('app_origin_historial'); 
+        }
+
+        return $this->render('origin_home/nuevo.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * HISTORIAL: Ver lo que ya se envió (Aprobaciones originadas)
+     */
+    #[Route('/origin/historial', name: 'app_origin_historial')]
+    public function historial(EntityManagerInterface $entityManager): Response
+    {
+        // Buscamos solo las solicitudes que pertenecen al usuario logueado
+        $solicitudes = $entityManager->getRepository(SolicitudesDcr::class)->findBy(
+            ['originador' => $this->getUser()],
+            ['fecha_creacion' => 'DESC']
+        );
+
+        return $this->render('origin_home/historial.html.twig', [
+            'solicitudes' => $solicitudes,
+        ]);
+    }
+    
+    #[Route('/origin/detalle/{id}', name: 'app_origin_detalle')]
+public function detalle(int $id, EntityManagerInterface $entityManager): Response
+{
+    $solicitud = $entityManager->getRepository(SolicitudesDcr::class)->find($id);
+
+    if (!$solicitud) {
+        throw $this->createNotFoundException('La solicitud no existe.');
+    }
+
+    return $this->render('origin_home/detalle.html.twig', [
+        'solicitud' => $solicitud,
     ]);
 }
 }

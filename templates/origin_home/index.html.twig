@@ -1,6 +1,17 @@
 {# templates/origin_home/index.html.twig #}
 
+<div class="container mt-3">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} shadow-sm">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
+
 {{ form_start(form) }}
+{# {{ form_row(form._token) }} #}
     <div class="mb-3">
         {{ form_row(form.nombre_documento, {'label': 'Nombre del Documento'}) }}
     </div>
@@ -24,4 +35,6 @@
     </div>
 
     <button type="submit" class="btn btn-success w-100">Enviar aprobación...</button>
+    {{ form_rest(form) }}
+
 {{ form_end(form) }}

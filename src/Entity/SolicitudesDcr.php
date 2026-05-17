@@ -36,7 +36,8 @@ class SolicitudesDcr
         #[ORM\Column(type: 'string', enumType: \App\Enum\Estatus::class)]
         private ?\App\Enum\Estatus $estatus = null;
 
-        #[ORM\OneToOne(inversedBy: 'solicitudesDcr', cascade: ['persist', 'remove'])]
+        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'solicitudesDcrs')]
+        #[ORM\JoinColumn(nullable: false)]
         private ?User $originador = null;
 
         /**

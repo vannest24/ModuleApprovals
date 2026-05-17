@@ -40,6 +40,7 @@ class SolicitudType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => SolicitudesDcr::class,
+            'csrf_protection' => false,
         ]);
     }
 }
