@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="card shadow" style="background-color: #fffde7; border-left: 5px solid #198754;">
+        <div class="card-body">
+            <h2 class="text-center">Revisión de Solicitud</h2>
+            <hr>
+            
+            <p><strong>Documento:</strong> {{ solicitud.nombreDocumento }}</p>
+            <p><strong>Revisión:</strong> {{ solicitud.numeroRevision }}</p>
+            <p><strong>Originador:</strong> {{ solicitud.originador.email }}</p>
+
+            <div class="alert alert-info">
+                <strong>Link de Revisión:</strong> 
+                <a href="{{ solicitud.linkSharepoint }}" target="_blank">Abrir en SharePoint</a>
+            </div>
+
+            {# SECCIÓN DE ACCIONES ÚNICA #}
+            <form method="POST">
+                <div class="row mt-5">
+                    <div class="col-md-6">
+                        <button type="submit" name="accion" value="aprobar" class="btn btn-success w-100 p-3">
+                            <i class="bi bi-check-circle"></i> Aprobar Solicitud
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <textarea name="comentario" class="form-control" placeholder="Motivo del rechazo (opcional)"></textarea>
+                        </div>
+                        <button type="submit" name="accion" value="rechazar" class="btn btn-danger w-100 p-3">
+                            <i class="bi bi-x-circle"></i> Rechazar Solicitud
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="text-center mt-4">
+                <a href="{{ path('app_approval_home') }}" class="btn btn-link text-muted">Volver a pendientes</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

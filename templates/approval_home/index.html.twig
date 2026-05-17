@@ -1,20 +1,47 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ApprovalHomeController!{% endblock %}
-
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Aprobaciones Pendientes (Harman DCR)</h2>
+        <span class="badge bg-primary">Modo: Aprobador</span>
+    </div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/workspaces/ModuleApprovals/src/Controller/ApprovalHomeController.php</code></li>
-        <li>Your template at <code>/workspaces/ModuleApprovals/templates/approval_home/index.html.twig</code></li>
-    </ul>
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Documento</th>
+                        <th>Revisión</th>
+                        <th>Originador</th>
+                        <th>Fecha</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for solicitud in solicitudes %}
+                        <tr>
+                            <td>{{ solicitud.nombreDocumento }}</td>
+                            <td>{{ solicitud.numeroRevision }}</td>
+                            <td>{{ solicitud.originador.email }}</td>
+                            <td>{{ solicitud.fechaCreacion|date('d/m/Y') }}</td>
+                            <td>
+                                <a href="{{ path('app_approval_detalle', {'id': solicitud.id}) }}" class="btn btn-sm btn-info">
+                                    <i class="bi bi-plus-lg"></i> Ver para aprobar
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                No tienes solicitudes pendientes por ahora.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

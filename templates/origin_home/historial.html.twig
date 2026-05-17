@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-4">
+    <a href="{{ path('app_origin_home') }}" class="btn btn-secondary mb-3">Volver al Menú</a>
+    
+    <h3>Aprobaciones originadas</h3>
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Documento</th>
+                <th>Revisión</th>
+                <th>Estatus</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for solicitud in solicitudes %}
+                <tr>
+                    <td>{{ solicitud.nombreDocumento }}</td>
+                    <td>{{ solicitud.numeroRevision }}</td>
+                    <td>{{ solicitud.estatus.value }}</td>
+                    <td>
+                        <a href="{{ path('app_origin_detalle', {'id': solicitud.id}) }}" class="btn btn-sm btn-info">
+                            + Ver Detalles
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
