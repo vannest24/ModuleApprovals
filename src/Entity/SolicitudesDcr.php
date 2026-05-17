@@ -45,9 +45,16 @@ class SolicitudesDcr
         #[ORM\OneToMany(targetEntity: Aprobaciones::class, mappedBy: 'solicitud')]
         private Collection $aprobaciones;
 
+        /**
+         * @var Collection<int, User>
+         */
+        #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'solicitudesDcrs')]
+        private Collection $aprobadores;
+
         public function __construct()
         {
             $this->aprobaciones = new ArrayCollection();
+            $this->aprobadores = new ArrayCollection();
         }
 
 
@@ -166,6 +173,30 @@ class SolicitudesDcr
                 $aprobacione->setSolicitud(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getAprobadores(): Collection
+    {
+        return $this->aprobadores;
+    }
+
+    public function addAprobadore(User $aprobadore): static
+    {
+        if (!$this->aprobadores->contains($aprobadore)) {
+            $this->aprobadores->add($aprobadore);
+        }
+
+        return $this;
+    }
+
+    public function removeAprobadore(User $aprobadore): static
+    {
+        $this->aprobadores->removeElement($aprobadore);
 
         return $this;
     }

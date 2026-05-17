@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Entity;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM; 
 use App\Entity\Aprobaciones;
 use App\Entity\SolicitudesDcr;
@@ -43,6 +45,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToOne(mappedBy: 'aprobador', cascade: ['persist', 'remove'])]
     private ?Aprobaciones $aprobaciones = null;
+
+    /**
+     * @var Collection<int, SolicitudesDcr>
+     */
+    #[ORM\ManyToMany(targetEntity: SolicitudesDcr::class, mappedBy: 'aprobadores')]
+    private Collection $solicitudesDcrs;
+
+    public function __construct()
+    {
+        $this->solicitudesDcrs = new ArrayCollection();
+    }
 
     public function getEmail(): ?string
     {
@@ -171,6 +184,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $this->aprobaciones = $aprobaciones;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SolicitudesDcr>
+     */
+    public function getSolicitudesDcrs(): Collection
+    {
+        return $this->solicitudesDcrs;
+    }
+
+    public function addSolicitudesDcr(SolicitudesDcr $solicitudesDcr): static
+    {
+        if (!$this->solicitudesDcrs->contains($solicitudesDcr)) {
+            $this->solicitudesDcrs->add($solicitudesDcr);
+            $solicitudesDcr->addAprobadore($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSolicitudesDcr(SolicitudesDcr $solicitudesDcr): static
+    {
+        if ($this->solicitudesDcrs->removeElement($solicitudesDcr)) {
+            $solicitudesDcr->removeAprobadore($this);
+        }
 
         return $this;
     }
