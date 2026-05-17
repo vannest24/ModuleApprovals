@@ -42,16 +42,31 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         );
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-    {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
-            return new RedirectResponse($targetPath);
-        }
-
-        // For example:
-        return new RedirectResponse($this->urlGenerator->generate('app_dash_board'));
-        throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
+{
+    if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
+        return new RedirectResponse($targetPath);
     }
+
+    // 1. Obtenemos los roles del usuario que acaba de loguearse
+    $roles = $token->getRoleNames();
+
+    // 2. Lógica de redirección basada en prioridades
+    if (in_array('ROLE_ADMIN', $roles)) {
+        return new RedirectResponse($this->urlGenerator->generate('app_admin_home'));
+    } 
+    
+    if (in_array('ROLE_APROBADOR', $roles)) {
+        return new RedirectResponse($this->urlGenerator->generate('app_approval_home'));
+    }
+
+    if (in_array('ROLE_ORIGINADOR', $roles)) {
+        return new RedirectResponse($this->urlGenerator->generate('app_origin_home'));
+    }
+
+    // Ruta por defecto si no tiene ninguno de los anteriores
+    return new RedirectResponse($this->urlGenerator->generate('app_dashboard'));
+}
 
     protected function getLoginUrl(Request $request): string
     {

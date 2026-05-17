@@ -20,17 +20,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->id;
     }
-    private $email;
+    #[ORM\Column(length: 180, unique: true)]
+    private ?string $email = null;
 
     /**
      * @var list<string> The user roles
      */
-    private $roles = [];
+    #[ORM\Column]
+    private array $roles = [];
 
     /**
      * @var string The hashed password
      */
-    private $password;
+    #[ORM\Column]
+    private ?string $password = null;
 
     #[ORM\OneToOne(mappedBy: 'id_user_fk', cascade: ['persist', 'remove'])]
     private ?Usuario $usuario = null;
