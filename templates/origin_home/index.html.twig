@@ -1,20 +1,27 @@
-{% extends 'base.html.twig' %}
+{# templates/origin_home/index.html.twig #}
 
-{% block title %}Hello OriginHomeController!{% endblock %}
+{{ form_start(form) }}
+    <div class="mb-3">
+        {{ form_row(form.nombre_documento, {'label': 'Nombre del Documento'}) }}
+    </div>
+    
+    <div class="mb-3">
+        {{ form_row(form.numero_revision, {'label': 'No. Revisión'}) }}
+    </div>
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <div class="mb-3">
+        {{ form_row(form.link_sharepoint, {'label': 'Link de SharePoint'}) }}
+    </div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.fecha_limite) }}
+        </div>
+    </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/workspaces/ModuleApprovals/src/Controller/OriginHomeController.php</code></li>
-        <li>Your template at <code>/workspaces/ModuleApprovals/templates/origin_home/index.html.twig</code></li>
-    </ul>
-</div>
-{% endblock %}
+    <div class="mb-3">
+        {{ form_row(form.aprobadores) }}
+    </div>
+
+    <button type="submit" class="btn btn-success w-100">Enviar aprobación...</button>
+{{ form_end(form) }}
