@@ -96,3 +96,40 @@
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
 }
+/* Estilo para la barra superior */
+.top-bar {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 2rem;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+/* Estilo del botón de cerrar sesión */
+.btn-logout {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #dc3545; /* Rojo para acciones de salida */
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    background-color: #c82333;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
+}
+
+.btn-logout i {
+    font-size: 1.1rem;
+}
