@@ -18,8 +18,8 @@ class Aprobaciones
         #[ORM\Column(type: 'string', enumType: \App\Enum\Status::class)]
         private ?\App\Enum\Status $estatus = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $fecha_respuesta = null;
+        #[ORM\Column(nullable: true)] // Agrega nullable: true
+        private ?\DateTimeImmutable $fecha_respuesta = null;
 
     #[ORM\Column(length: 255)]
     private ?string $comentarios = null;
@@ -27,7 +27,8 @@ class Aprobaciones
     #[ORM\ManyToOne(inversedBy: 'aprobaciones')]
     private ?SolicitudesDcr $solicitud = null;
 
-    #[ORM\OneToOne(inversedBy: 'aprobaciones', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'aprobaciones')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $aprobador = null;
 
     public function getId(): ?int

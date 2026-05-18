@@ -1,33 +1,161 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Mi Historial DCR{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/menu.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/historial.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+
 {% block body %}
-<div class="container mt-4">
-    <a href="{{ path('app_origin_home') }}" class="btn btn-secondary mb-3">Volver al Menú</a>
-    
-    <h3>Aprobaciones originadas</h3>
-    <table class="table table-striped mt-3">
-        <thead>
-            <tr>
-                <th>Documento</th>
-                <th>Revisión</th>
-                <th>Estatus</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for solicitud in solicitudes %}
-                <tr>
-                    <td>{{ solicitud.nombreDocumento }}</td>
-                    <td>{{ solicitud.numeroRevision }}</td>
-                    <td>{{ solicitud.estatus.value }}</td>
-                    <td>
-                        <a href="{{ path('app_origin_detalle', {'id': solicitud.id}) }}" class="btn btn-sm btn-info">
-                            + Ver Detalles
-                        </a>
-                    </td>
-                </tr>
+    {# Barra superior con Logout #}
+    <div class="top-bar">
+        <a href="{{ path('app_logout') }}" class="btn-logout">
+            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+        </a>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="table-card">
+            {# BOTÓN DE VOLVER (Posicionado en la esquina superior derecha de la tarjeta blanca) #}
+            <a href="{{ path('app_origin_home') }}" class="btn-back-floating">
+                <i class="bi bi-house-door-fill"></i> <span>Volver al Menú</span>
+            </a>
+
+            {# Mensajes Flash de éxito #}
+            {% for message in app.flashes('exito_historial') %}
+                <div class="alert alert-success alert-dismissible fade show alert-custom" role="alert" style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 0.8rem; margin-bottom: 1.5rem; border: 1px solid #c3e6cb;">
+                    <i class="bi bi-check-circle-fill"></i> {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="float: right; background: none; border: none; cursor: pointer; font-weight: bold;">&times;</button>
+                </div>
             {% endfor %}
-        </tbody>
-    </table>
-</div>
+
+            <div class="table-header">
+                <i class="bi bi-clock-history"></i>
+                <div>
+                    <h2 class="m-0">Mi Historial</h2>
+                    <p class="text-muted m-0">Seguimiento de tus solicitudes DCR</p>
+                </div>
+            </div>
+
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Documento</th>
+                        <th>Revisión</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {# USAMOS LOS NOMBRES DE VARIABLES DE TU ENTIDAD #}
+                    {% for solicitud in solicitudes %}
+                        <tr>
+                            <td><strong>{{ solicitud.nombreDocumento }}</strong></td>
+                            <td><span class="text-muted">{{ solicitud.numeroRevision }}</span></td>
+                            <td>{{ solicitud.fechaCreacion|date('d/m/Y') }}</td>
+                            <td>
+                                {# Acceso al valor del Enum Estatus #}
+                                {% set estatus_val = solicitud.estatus.value|lower %}
+                                <span class="status-badge badge-{{ estatus_val }}">
+                                    <i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i>
+                                    {{ solicitud.estatus.value }}
+                                </span>
+                            </td>
+                            <td>
+                                <button type="button" class="btn-view" 
+                                    onclick="verDetalles(
+                                        '{{ solicitud.nombreDocumento|escape('js') }}', 
+                                        '{{ solicitud.numeroRevision|escape('js') }}', 
+                                        '{{ solicitud.fechaCreacion|date('d/m/Y H:i') }}', 
+                                        '{{ solicitud.fechaLimite|date('d/m/Y') }}', 
+                                        '{{ solicitud.estatus.value }}', 
+                                        '{{ solicitud.linkSharepoint|escape('js') }}'
+                                    )">
+                                    <i class="bi bi-eye"></i> Detalles
+                                </button>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center" style="padding: 3rem;">
+                                <p class="text-muted">No se encontraron solicitudes registradas.</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# VENTANA MODAL (Oculta por defecto) #}
+    <div id="modalDetalles" class="modal-container">
+        <div class="modal-content card-detalle">
+            <div class="modal-header-detalle">
+                <h3><i class="bi bi-info-circle-fill"></i> Información de la Solicitud</h3>
+                <span class="close-modal" onclick="cerrarModal()">&times;</span>
+            </div>
+            <div class="modal-body-detalle">
+                <div class="detalle-item">
+                    <label>Nombre del Documento:</label>
+                    <p id="det-nombre"></p>
+                </div>
+                <div class="detalle-row">
+                    <div class="detalle-item">
+                        <label>Revisión:</label>
+                        <p id="det-revision"></p>
+                    </div>
+                    <div class="detalle-item">
+                        <label>Estatus Actual:</label>
+                        <p id="det-estatus"></p>
+                    </div>
+                </div>
+                <div class="detalle-row">
+                    <div class="detalle-item">
+                        <label>Fecha de Creación:</label>
+                        <p id="det-creacion"></p>
+                    </div>
+                    <div class="detalle-item">
+                        <label>Fecha Límite:</label>
+                        <p id="det-limite"></p>
+                    </div>
+                </div>
+                <hr>
+                <div class="detalle-item text-center">
+                    <label>Acceso al Documento:</label><br>
+                    <a id="det-link" href="#" target="_blank" class="btn-link-sp">
+                        <i class="bi bi-sharepoint"></i> Abrir en SharePoint
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function verDetalles(nombre, rev, creacion, limite, estatus, link) {
+            document.getElementById('det-nombre').innerText = nombre;
+            document.getElementById('det-revision').innerText = rev;
+            document.getElementById('det-creacion').innerText = creacion;
+            document.getElementById('det-limite').innerText = limite;
+            document.getElementById('det-estatus').innerText = estatus;
+            document.getElementById('det-link').href = link;
+            
+            document.getElementById('modalDetalles').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalDetalles').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            let modal = document.getElementById('modalDetalles');
+            if (event.target == modal) { cerrarModal(); }
+        }
+    </script>
 {% endblock %}

@@ -1,19 +1,107 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Nueva Solicitud DCR{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/menu.css') }}">
+    {# Mantenemos el CSS de Tom Select para el diseño de la lista #}
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/formularios.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+
 {% block body %}
-<div class="container mt-4">
-    <a href="{{ path('app_origin_home') }}" class="btn btn-secondary mb-3">Volver al Menú</a>
-    
-    <div class="card" style="background-color: #fff9c4; border: 2px solid #fbc02d;">
-        <div class="card-header bg-warning">
-            <h4 class="mb-0 text-dark">Formulario para crear nueva aprobación</h4>
-        </div>
-        <div class="card-body">
-            {{ form_start(form) }}
-                {{ form_widget(form) }}
-                <button type="submit" class="btn btn-success w-100 mt-3">Mandar a BD</button>
-            {{ form_end(form) }}
+    <div class="top-bar">
+        <a href="{{ path('app_logout') }}" class="btn-logout">
+            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+        </a>
+    </div>
+
+    <div class="form-card-container">
+        <div class="form-card">
+            <div class="form-header">
+                <i class="bi bi-file-earmark-plus-fill" style="font-size: 3rem; color: #007bc0;"></i>
+                <h2>Nueva Solicitud DCR</h2>
+                <p class="text-muted">Ingresa la información técnica del documento</p>
+            </div>
+
+            <form method="POST">
+                <input type="hidden" name="_token" value="{{ csrf_token('solicitud_dcr') }}">
+
+                <div class="form-group">
+                    <label for="nombre_documento">Nombre del Documento</label>
+                    <input type="text" name="nombre_documento" id="nombre_documento" class="form-control-custom" placeholder="Ej. PFMEA-Engine-001" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="numero_revision">Número de Revisión</label>
+                    <input type="text" name="numero_revision" id="numero_revision" class="form-control-custom" placeholder="Ej. Rev. A" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="link_sharepoint">Link de SharePoint</label>
+                    <input type="url" name="link_sharepoint" id="link_sharepoint" class="form-control-custom" placeholder="https://harman.sharepoint.com/..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="fecha_limite">Fecha Límite de Aprobación</label>
+                    <input type="date" name="fecha_limite" id="fecha_limite" class="form-control-custom" required>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 2rem 0;">
+
+                {# SECCIÓN DE APROBADORES #}
+                <div class="form-group">
+                    <label for="select-aprobadores">Asignar Aprobadores</label>
+                    <select name="aprobadores[]" id="select-aprobadores" class="form-control-custom" multiple placeholder="Busca por nombre o área..." autocomplete="off">
+                        {% for aprobador in lista_aprobadores %}
+                            <option value="{{ aprobador.id }}">
+                                {{ aprobador.nombreCompleto }} — {{ aprobador.area }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small class="help-text">Escribe el nombre del jefe o el departamento para filtrar.</small>
+                </div>
+
+                <button type="submit" class="btn-submit-custom">
+                    <i class="bi bi-send-check"></i> Iniciar Flujo de Aprobación
+                </button>
+
+                <a href="{{ path('app_origin_home') }}" class="btn-back">
+                    <i class="bi bi-arrow-left"></i> Volver al Menú Principal
+                </a>
+            </form>
         </div>
     </div>
-</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {# Solo cargamos la librería del buscador #}
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectElement = document.getElementById('select-aprobadores');
+            if (selectElement) {
+                new TomSelect(selectElement, {
+                    plugins: {
+                        'remove_button': { title: 'Eliminar' },
+                        'checkbox_options': {}
+                    },
+                    persist: false,
+                    create: false,
+                    maxItems: 10,
+                    hideSelected: false,
+                    closeAfterSelect: false,
+                    placeholder: "Escribe para buscar...",
+                    render: {
+                        option: function(data, escape) {
+                            return '<div><span class="name">' + escape(data.text) + '</span></div>';
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 {% endblock %}

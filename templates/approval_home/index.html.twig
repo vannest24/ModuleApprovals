@@ -1,19 +1,42 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Aprobaciones Pendientes{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {# Forzamos la actualización de estilos para evitar problemas de caché #}
+    <link rel="stylesheet" href="{{ asset('css/historial.css') }}?v=1.4">
+    <link rel="stylesheet" href="{{ asset('css/aprobaciones.css') }}?v=1.4">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+
 {% block body %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Aprobaciones Pendientes (Harman DCR)</h2>
-        <span class="badge bg-primary">Modo: Aprobador</span>
+    <div class="top-bar">
+        <a href="{{ path('app_logout') }}" class="btn-logout">
+            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+        </a>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-                <thead class="table-dark">
+    <div class="dashboard-container">
+        <div class="table-card">
+            {# Botón flotante para regresar al menú principal #}
+            <a href="{{ path('app_origin_home') }}" class="btn-back-floating">
+                <i class="bi bi-house-door-fill"></i> <span>Volver al Menú</span>
+            </a>
+
+            <div class="table-header">
+                <i class="bi bi-person-check-fill"></i>
+                <div>
+                    <h2 class="m-0">Aprobaciones Pendientes</h2>
+                    <p class="text-muted m-0">Documentos DCR que requieren tu revisión técnica</p>
+                </div>
+            </div>
+
+            {# Tabla de Solicitudes #}
+            <table class="custom-table">
+                <thead>
                     <tr>
                         <th>Documento</th>
-                        <th>Revisión</th>
                         <th>Originador</th>
                         <th>Fecha</th>
                         <th>Acción</th>
@@ -22,20 +45,19 @@
                 <tbody>
                     {% for solicitud in solicitudes %}
                         <tr>
-                            <td>{{ solicitud.nombreDocumento }}</td>
-                            <td>{{ solicitud.numeroRevision }}</td>
-                            <td>{{ solicitud.originador.email }}</td>
+                            <td><strong>{{ solicitud.nombreDocumento }}</strong></td>
+                            <td>{{ solicitud.originador.nombreCompleto }}</td>
                             <td>{{ solicitud.fechaCreacion|date('d/m/Y') }}</td>
                             <td>
-                                <a href="{{ path('app_approval_detalle', {'id': solicitud.id}) }}" class="btn btn-sm btn-info">
-                                    <i class="bi bi-plus-lg"></i> Ver para aprobar
-                                </a>
+                                <button type="button" class="btn-view" data-bs-toggle="modal" data-bs-target="#modal-{{ solicitud.id }}">
+                                    <i class="bi bi-pencil-square"></i> Revisar
+                                </button>
                             </td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="5" class="text-center py-4 text-muted">
-                                No tienes solicitudes pendientes por ahora.
+                            <td colspan="4" class="text-center" style="padding: 3rem;">
+                                <p class="text-muted">No tienes aprobaciones pendientes por el momento.</p>
                             </td>
                         </tr>
                     {% endfor %}
@@ -43,5 +65,56 @@
             </table>
         </div>
     </div>
-</div>
+
+    {# SECCIÓN DE MODALES: Uno por cada solicitud fuera del contenedor de la tabla #}
+    {% for solicitud in solicitudes %}
+        <div class="modal fade" id="modal-{{ solicitud.id }}" tabindex="-1" aria-labelledby="modalLabel-{{ solicitud.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content" style="border-top: 6px solid #007bc0; border-radius: 1.5rem;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalLabel-{{ solicitud.id }}">
+                            <i class="bi bi-file-earmark-text"></i> Revisión: {{ solicitud.nombreDocumento }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="POST">
+                        <div class="modal-body">
+                            <input type="hidden" name="solicitud_id" value="{{ solicitud.id }}">
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="fw-bold text-muted small text-uppercase">Originador</label>
+                                    <p class="mb-0">{{ solicitud.originador.nombreCompleto }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="fw-bold text-muted small text-uppercase">Revisión</label>
+                                    <p class="mb-0">{{ solicitud.numeroRevision }}</p>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info d-flex align-items-center">
+                                <i class="bi bi-sharepoint fs-4 me-3"></i>
+                                <div>
+                                    <a href="{{ solicitud.linkSharepoint }}" target="_blank" class="alert-link">Consultar archivos en SharePoint</a>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="fw-bold text-muted small text-uppercase">Comentarios Técnicos</label>
+                                <textarea name="comentarios" class="form-control" rows="3" placeholder="Indique el motivo de su aprobación o rechazo..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light">
+                            <button type="submit" name="accion" value="aprobar" class="btn btn-success px-4">
+                                <i class="bi bi-check-circle"></i> Aprobar
+                            </button>
+                            <button type="submit" name="accion" value="rechazar" class="btn btn-danger px-4">
+                                <i class="bi bi-x-circle"></i> Rechazar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}
