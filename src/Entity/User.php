@@ -214,4 +214,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    // src/Entity/User.php
+
+public function getNombreCompleto(): string
+{
+
+    // Si existe la relación con la entidad Usuario, sacamos el nombre de ahí
+    if ($this->usuario) {
+        // Ajusta 'getNombre' según cómo se llame el método en tu entidad Usuario
+        return $this->usuario->getNombreCompleto(); 
+    }
+
+    // Si no hay datos de usuario, mostramos el email como respaldo
+    return $this->email;
+}
+
+public function getArea(): string
+{
+    if ($this->usuario) {
+        // Ajusta 'getArea' según tu entidad Usuario
+        return $this->usuario->getArea();
+    }
+
+    return 'Sin Área';
+}
 }

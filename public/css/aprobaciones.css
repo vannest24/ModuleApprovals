@@ -1,0 +1,135 @@
+/* public/css/aprobaciones.css */
+
+/* Personalización del icono de cabecera para Aprobaciones */
+.table-header i.bi-person-check-fill {
+    color: #007bc0; /* Azul Harman */
+    font-size: 2.5rem;
+}
+
+/* Estilo para el botón de Revisar */
+.btn-view i.bi-pencil-square {
+    margin-right: 5px;
+}
+
+/* Resaltar la columna del originador */
+.custom-table td:nth-child(3) {
+    font-weight: 500;
+    color: #444;
+}
+
+/* Ajuste de hover para filas de aprobación */
+.custom-table tbody tr:hover td {
+    background-color: #f0f7ff;
+    transition: background-color 0.2s ease;
+}
+/* public/css/aprobaciones.css */
+
+.card-detalle-completa {
+    max-width: 800px !important;
+    border-left: 8px solid #007bc0; /* Azul Harman */
+}
+
+.alert-sharepoint {
+    background-color: #e3f2fd;
+    border: 1px dashed #007bc0;
+    color: #005a8e;
+    padding: 1rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 1.5rem;
+}
+
+.alert-sharepoint i {
+    font-size: 2rem;
+}
+
+.seccion-decision {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 1rem;
+    border: 1px solid #eee;
+}
+
+.form-label-custom {
+    font-weight: 700;
+    color: #444;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.btn-decision {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-aprobar {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-aprobar:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+.btn-rechazar {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-rechazar:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+}
+/* Estilo para la barra superior */
+.top-bar {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 2rem;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+/* Estilo del botón de cerrar sesión */
+.btn-logout {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #dc3545; /* Rojo para acciones de salida */
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    background-color: #c82333;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
+}
+
+.btn-logout i {
+    font-size: 1.1rem;
+}

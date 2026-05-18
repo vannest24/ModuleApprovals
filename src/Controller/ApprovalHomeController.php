@@ -7,16 +7,48 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\SolicitudesDcr;
+use App\Entity\Aprobaciones;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Enum\Estatus;
+use App\Enum\Status;
 
 final class ApprovalHomeController extends AbstractController
 {
     #[Route('/approval/home', name: 'app_approval_home')]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
 
+        // 1. PROCESAR LA DECISIÓN DESDE EL MODAL (POST)
+        if ($request->isMethod('POST')) {
+            $id = $request->request->get('solicitud_id');
+            $accion = $request->request->get('accion');
+            $solicitud = $entityManager->getRepository(SolicitudesDcr::class)->find($id);
+
+            if ($solicitud) {
+                $aprobacion = $entityManager->getRepository(Aprobaciones::class)->findOneBy([
+                    'solicitud' => $solicitud,
+                    'aprobador' => $user
+                ]);
+
+                if ($aprobacion) {
+                    if ($accion === 'aprobar') {
+                        $aprobacion->setEstatus(Status::APROBADA);
+                    } else {
+                        $aprobacion->setEstatus(Status::RECHAZADA);
+                        $solicitud->setEstatus(Estatus::RECHAZADA);
+                    }
+                    $aprobacion->setFechaRespuesta(new \DateTimeImmutable());
+                    $aprobacion->setComentarios($request->request->get('comentarios', 'Sin comentarios.'));
+                    
+                    $entityManager->flush();
+                    $this->addFlash('success', 'Dictamen registrado en el sistema Harman.');
+                }
+            }
+            return $this->redirectToRoute('app_approval_home');
+        }
+
+        // 2. CARGAR LISTA DE SOLICITUDES PENDIENTES
         $pendientes = $entityManager->getRepository(SolicitudesDcr::class)
             ->createQueryBuilder('s')
             ->join('s.aprobadores', 'a')
@@ -43,7 +75,6 @@ final class ApprovalHomeController extends AbstractController
         if ($request->isMethod('POST')) {
             $accion = $request->request->get('accion');
             
-            // IMPORTANTE: Revisa si en tu Enum es APROBADO o APROBADA
             if ($accion === 'aprobar') {
                 $solicitud->setEstatus(Estatus::APROBADA); 
             } elseif ($accion === 'rechazar') {
@@ -52,7 +83,6 @@ final class ApprovalHomeController extends AbstractController
 
             $entityManager->flush();
             $this->addFlash('success', 'Decisión registrada correctamente.');
-            
             return $this->redirectToRoute('app_approval_home');
         }
 
@@ -60,4 +90,4 @@ final class ApprovalHomeController extends AbstractController
             'solicitud' => $solicitud,
         ]);
     }
-}
+} 

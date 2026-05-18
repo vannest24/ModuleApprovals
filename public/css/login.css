@@ -1,0 +1,106 @@
+/* Estilos para el login - Sistema DCR */
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+    background-color: #f4f7f9; /* Un gris muy claro de fondo para que resalte el blanco */
+}
+
+.form {
+  --bg-light: #ffffff;
+  --bg-dark: #007bc0; /* Azul Harman */
+  --clr-hover: #005a8c;
+  --clr-alpha: #f0f7ff; 
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 380px;
+  padding: 2.5rem;
+  background: white;
+  border-radius: 1.2rem;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+}
+
+.form img {
+    max-width: 180px;
+    height: auto;
+    margin-bottom: 1.5rem;
+}
+
+.form .input-span {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form input[type="email"],
+.form input[type="password"] {
+  border-radius: 0.6rem;
+  padding: 0.9rem 0.75rem;
+  width: 100%;
+  border: 1px solid #d1d9e0;
+  background-color: var(--bg-light);
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.form input[type="email"]:focus,
+.form input[type="password"]:focus {
+  border-color: var(--bg-dark);
+  box-shadow: 0 0 0 3px rgba(0, 123, 192, 0.15);
+}
+
+.label {
+  align-self: flex-start;
+  color: #333;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.form .submit {
+  padding: 0.9rem;
+  width: 100%;
+  border-radius: 3rem;
+  background-color: var(--bg-dark);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 300ms, transform 200ms;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.form .submit:hover {
+  background-color: var(--clr-hover);
+  transform: translateY(-1px);
+}
+
+.form .submit:active {
+  transform: translateY(0);
+}
+
+.span {
+  text-decoration: none;
+  color: #777;
+  font-size: 0.8rem;
+}
+
+.span a {
+  color: var(--bg-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.span a:hover {
+  text-decoration: underline;
+}
+
+.sf-toolbar {
+    display: none !important;
+}

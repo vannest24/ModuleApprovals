@@ -1,34 +1,54 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}DCR Aproval System{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+{% endblock %}
 
 {% block body %}
-<form method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+<div class="form-container">
+    <form class="form" method="post">
+        
+        <img src="{{ asset('images/logo_harman.png') }}" alt="Harman Logo">
 
-    {% if app.user %}
-        <div class="mb-3">
-            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
+        <h4 class="mb-3 text-secondary">Aproval System</h4>
+
+        {% if error %}
+            <div class="alert alert-danger w-100 py-2" style="font-size: 0.85rem;">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        <div class="input-span">
+            <label for="inputEmail" class="label">Correo Electrónico</label>
+            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" autocomplete="email" required autofocus placeholder="usuario@harman.com">
         </div>
-    {% endif %}
 
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputEmail">Email</label>
-    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-    <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-    <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+        <div class="input-span">
+            <label for="inputPassword" class="label">Contraseña</label>
+            <input type="password" name="password" id="inputPassword" autocomplete="current-password" required placeholder="••••••••">
+        </div>
 
-    <div class="checkbox mb-3">
-        <label>
-            <input type="checkbox" name="_remember_me"> Remember me
-        </label>
-    </div>
+        {# Token CSRF de seguridad #}
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-    <button class="btn btn-lg btn-primary" type="submit">
-        Sign in
-    </button>
-</form>
+        <div class="remember-me-container">
+    <label class="checkbox-wrapper">
+        <input type="checkbox" name="_remember_me" id="_remember_me">
+        <span class="checkmark"></span>
+        <span class="label-text">Mantener sesión iniciada</span>
+    </label>
+</div>
+        
+        <button class="submit" type="submit">
+            Iniciar sesión
+        </button>
+        
+        <div class="mt-3 text-center">
+            <span class="span">MBU Department - AMEF Area</span>
+        </div>
+    </form>
+</div>
 {% endblock %}

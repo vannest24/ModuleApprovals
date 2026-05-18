@@ -1,0 +1,246 @@
+/* public/css/formularios.css */
+
+.form-card-container {
+    display: flex;
+    justify-content: center;
+    padding: 3rem 1rem;
+    background-color: #f4f7f9;
+    min-height: 100vh;
+}
+
+.form-card {
+    background: white;
+    width: 100%;
+    max-width: 700px; /* Un poco más ancho para los nuevos campos */
+    padding: 3rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    border-top: 6px solid #007bc0;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.form-header h2 {
+    color: #333;
+    font-weight: 700;
+    margin-top: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.8rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 0.6rem;
+    font-size: 0.95rem;
+}
+
+/* Estilo para los inputs y selectores */
+.form-control-custom, .form-select-custom {
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    border-radius: 0.8rem;
+    border: 1px solid #dce4ec;
+    background-color: #fdfdfd;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    color: #333;
+}
+
+.form-control-custom:focus, .form-select-custom:focus {
+    border-color: #007bc0;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(0, 123, 192, 0.1);
+    outline: none;
+}
+
+/* Estilo específico para el selector de aprobadores */
+.form-select-custom {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 16px 12px;
+    appearance: none;
+}
+
+.help-text {
+    font-size: 0.85rem;
+    color: #777;
+    margin-top: 0.4rem;
+    display: block;
+}
+
+.btn-submit-custom {
+    width: 100%;
+    padding: 1.1rem;
+    background-color: #007bc0;
+    color: white;
+    border: none;
+    border-radius: 3rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.btn-submit-custom:hover {
+    background-color: #005a8c;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 123, 192, 0.2);
+}
+
+.btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    color: #999;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.btn-back:hover {
+    color: #007bc0;
+}
+/* Personalización de Tom Select para Harman */
+.ts-control {
+    border-radius: 0.8rem !important;
+    padding: 0.6rem 1rem !important;
+    border: 1px solid #dce4ec !important;
+    background-color: #fdfdfd !important;
+}
+
+.ts-control .item {
+    background-color: #007bc0 !important; /* Azul Harman */
+    color: white !important;
+    border-radius: 20px !important;
+    padding: 2px 12px !important;
+}
+
+.ts-dropdown .active {
+    background-color: #f0f7ff !important;
+    color: #007bc0 !important;
+}
+
+.item-selected {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+/* Asegura que el buscador sea visible y clickeable */
+.ts-control input {
+    display: inline-block !important;
+    opacity: 1 !important;
+    position: relative !important;
+}
+
+/* Estilo de los checkboxes en la lista desplegable */
+.ts-dropdown .option {
+    display: flex !important;
+    align-items: center;
+    padding: 8px 12px !important;
+}
+
+/* Crear el cuadro del checkbox */
+.ts-dropdown .option::before {
+    content: "";
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
+    border: 2px solid #dce4ec;
+    border-radius: 4px;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+/* Cuando el elemento está seleccionado (Check azul) */
+.ts-dropdown .selected::before {
+    background-color: #007bc0; /* Azul Harman */
+    border-color: #007bc0;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+    background-size: contain;
+}
+
+/* Ajuste para los "chips" de los seleccionados */
+.ts-control .item {
+    background-color: #007bc0 !important;
+    color: white !important;
+    border-radius: 20px !important;
+    padding: 2px 10px !important;
+    margin: 2px !important;
+}
+/* Forzar que el contenedor de Tom Select se vea como tus otros inputs */
+.ts-control {
+    border: 1px solid #dce4ec !important;
+    border-radius: 0.8rem !important;
+    padding: 0.5rem !important;
+    min-height: 45px !important;
+}
+
+/* Asegurar que el cursor aparezca y permita escribir */
+.ts-control input {
+    display: inline-block !important;
+    width: auto !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 5px !important;
+}
+
+/* Estilo para los "chips" de aprobadores seleccionados */
+.ts-control .item {
+    background-color: #007bc0 !important; /* Azul Harman */
+    color: white !important;
+    border-radius: 15px !important;
+    padding: 2px 10px !important;
+}
+/* Forzar que el buscador sea visible y reciba clics */
+.ts-wrapper.multi .ts-control > input {
+    display: inline-block !important;
+    width: auto !important;
+    min-width: 150px !important;
+    opacity: 1 !important;
+    position: relative !important;
+    background: transparent !important;
+}
+
+/* Ajuste del contenedor principal para que no colapse */
+.ts-control {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 5px !important;
+    cursor: text !important; /* Indica que se puede escribir */
+}
+
+/* Asegurar que el menú desplegable se vea por encima de todo */
+.ts-dropdown {
+    z-index: 9999 !important;
+}
+
+/* Estilo para los checks (cuadros blancos) */
+.ts-dropdown .option::before {
+    content: "";
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
+    border: 2px solid #dce4ec;
+    border-radius: 4px;
+    background: #fff;
+}

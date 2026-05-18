@@ -24,7 +24,7 @@ class SolicitudesDcr
     #[ORM\Column(length: 255)]
     private ?string $numero_revision = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $link_sharepoint = null;
 
     #[ORM\Column]

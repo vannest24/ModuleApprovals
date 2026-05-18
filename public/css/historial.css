@@ -1,0 +1,309 @@
+/* public/css/historial.css */
+
+:root {
+    --harman-blue: #007bc0;
+    --status-pending: #ffc107;
+    --status-approved: #28a745;
+    --status-rejected: #dc3545;
+}
+
+.dashboard-container {
+    padding: 2rem 1rem;
+    background-color: #f4f7f9;
+    min-height: 100vh;
+}
+
+.table-card {
+    background: white;
+    width: 100%;
+    max-width: 1000px;
+    margin: 5rem auto 2rem;
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+    border-top: 6px solid var(--harman-blue);
+}
+
+.table-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.table-header i {
+    font-size: 2.5rem;
+    color: var(--harman-blue);
+}
+
+/* Estilo de la Tabla */
+.custom-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+}
+
+.custom-table th {
+    color: #6c757d;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    padding: 1rem;
+    border-bottom: 2px solid #f8f9fa;
+    text-align: left;
+}
+
+.custom-table td {
+    padding: 1.2rem 1rem;
+    vertical-align: middle;
+    background: #fff;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+/* Badges de Estatus */
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.badge-abierta { background: #fff8e1; color: #b7791f; border: 1px solid #fbe389; }
+.badge-aprobada { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.badge-rechazada { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+
+/* Botón de acción */
+.btn-view {
+    color: var(--harman-blue);
+    border: 1px solid var(--harman-blue);
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+}
+
+.btn-view:hover {
+    background: var(--harman-blue);
+    color: white;
+}
+
+.alert-custom {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background-color: #d4edda;
+    color: #155724;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #c3e6cb;
+}
+/* Estilos para el Modal y la Tarjeta de Detalles */
+.modal-container {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+}
+
+.card-detalle {
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 1.5rem;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header-detalle {
+    background: #007bc0;
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header-detalle h3 { margin: 0; font-size: 1.2rem; }
+
+.close-modal {
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-body-detalle {
+    padding: 2rem;
+}
+
+.detalle-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+}
+
+.detalle-item label {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.detalle-item p {
+    font-size: 1rem;
+    color: #333;
+    font-weight: 600;
+    margin: 0;
+}
+
+.btn-link-sp {
+    display: inline-block;
+    margin-top: 1rem;
+    background: #007bc0;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.btn-link-sp:hover {
+    background: #005a8e;
+    color: white;
+}
+/* Contenedor relativo para que el botón se posicione respecto a este */
+.dashboard-container {
+    position: relative; 
+    padding: 2rem 1rem;
+    background-color: #f4f7f9;
+    min-height: 100vh;
+}
+
+/* Estilo del botón flotante en la esquina superior derecha */
+.btn-back-floating {
+    position: absolute;
+    top: 2rem;
+    right: 2.5rem; /* Ajustado para alinear con el margen de la tarjeta */
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background-color: white;
+    color: #6c757d;
+    padding: 0.7rem 1.2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    border: 1px solid #eee;
+}
+
+.btn-back-floating:hover {
+    background-color: #007bc0; /* Azul Harman */
+    color: white;
+    transform: translateX(-5px); /* Pequeño efecto visual al pasar el mouse */
+    box-shadow: 0 6px 15px rgba(0, 123, 192, 0.2);
+}
+
+.btn-back-floating i {
+    font-size: 1.1rem;
+}
+
+/* Ocultar el texto en pantallas pequeñas para que no choque */
+@media (max-width: 600px) {
+    .btn-back-floating span {
+        display: none;
+    }
+    .btn-back-floating {
+        right: 1rem;
+        padding: 0.7rem;
+    }
+}
+/* Asegura que la tarjeta sea el punto de referencia */
+.table-card {
+    position: relative; /* CRÍTICO */
+    background: white;
+    width: 100%;
+    max-width: 1000px;
+    margin: 5rem auto 2rem;
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+    border-top: 6px solid var(--harman-blue);
+}
+
+/* Reposicionamiento del botón */
+.btn-back-floating {
+    position: absolute;
+    top: 1.5rem; /* Distancia desde el borde superior de la tarjeta */
+    right: 1.5rem; /* Distancia desde el borde derecho de la tarjeta */
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    padding: 0.6rem 1rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: 1px solid #eee;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.btn-back-floating:hover {
+    background-color: var(--harman-blue);
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 123, 192, 0.2);
+}
+
+/* Ajuste para móviles: si la pantalla es pequeña, movemos el botón o reducimos padding */
+@media (max-width: 768px) {
+    .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 2rem; /* Espacio para que el botón no tape el título */
+    }
+}
+/* public/css/historial.css */
+
+/* Ajuste específico para el icono de aprobaciones */
+.table-header i.bi-person-check-fill {
+    color: var(--harman-blue);
+    font-size: 2.5rem;
+}
+
+/* El nombre del originador un poco más destacado */
+.custom-table td:nth-child(3) {
+    font-weight: 500;
+    color: #444;
+}
+
+/* Efecto hover para la fila */
+.custom-table tbody tr:hover td {
+    background-color: #f8fbff;
+}

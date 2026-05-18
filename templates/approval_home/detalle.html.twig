@@ -1,44 +1,69 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Aprobaciones Pendientes{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {# Forzamos v=1.1 para que el navegador no use versiones viejas #}
+    <link rel="stylesheet" href="{{ asset('css/menu.css') }}?v=1.1">
+    <link rel="stylesheet" href="{{ asset('css/historial.css') }}?v=1.1">
+    <link rel="stylesheet" href="{{ asset('css/aprobaciones.css') }}?v=1.1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+
 {% block body %}
-<div class="container mt-4">
-    <div class="card shadow" style="background-color: #fffde7; border-left: 5px solid #198754;">
-        <div class="card-body">
-            <h2 class="text-center">Revisión de Solicitud</h2>
-            <hr>
-            
-            <p><strong>Documento:</strong> {{ solicitud.nombreDocumento }}</p>
-            <p><strong>Revisión:</strong> {{ solicitud.numeroRevision }}</p>
-            <p><strong>Originador:</strong> {{ solicitud.originador.email }}</p>
+    <div class="top-bar">
+        <a href="{{ path('app_logout') }}" class="btn-logout">
+            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+        </a>
+    </div>
 
-            <div class="alert alert-info">
-                <strong>Link de Revisión:</strong> 
-                <a href="{{ solicitud.linkSharepoint }}" target="_blank">Abrir en SharePoint</a>
-            </div>
+    <div class="dashboard-container">
+        <div class="table-card">
+            <a href="{{ path('app_origin_home') }}" class="btn-back-floating">
+                <i class="bi bi-house-door-fill"></i> <span>Volver al Menú</span>
+            </a>
 
-            {# SECCIÓN DE ACCIONES ÚNICA #}
-            <form method="POST">
-                <div class="row mt-5">
-                    <div class="col-md-6">
-                        <button type="submit" name="accion" value="aprobar" class="btn btn-success w-100 p-3">
-                            <i class="bi bi-check-circle"></i> Aprobar Solicitud
-                        </button>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-2">
-                            <textarea name="comentario" class="form-control" placeholder="Motivo del rechazo (opcional)"></textarea>
-                        </div>
-                        <button type="submit" name="accion" value="rechazar" class="btn btn-danger w-100 p-3">
-                            <i class="bi bi-x-circle"></i> Rechazar Solicitud
-                        </button>
-                    </div>
+            <div class="table-header">
+                <i class="bi bi-person-check-fill"></i>
+                <div>
+                    <h2 class="m-0">Aprobaciones Pendientes</h2>
+                    <p class="text-muted m-0">Documentos DCR que requieren tu revisión</p>
                 </div>
-            </form>
-
-            <div class="text-center mt-4">
-                <a href="{{ path('app_approval_home') }}" class="btn btn-link text-muted">Volver a pendientes</a>
             </div>
+
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Documento</th>
+                        <th>Revisión</th>
+                        <th>Originador</th>
+                        <th>Fecha</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for aprobacion in solicitudes %}
+                        <tr>
+                            <td><strong>{{ aprobacion.solicitud.nombreDocumento }}</strong></td>
+                            <td><span class="text-muted">{{ aprobacion.solicitud.numeroRevision }}</span></td>
+                            <td>{{ aprobacion.solicitud.originador.nombreCompleto }}</td>
+                            <td>{{ aprobacion.solicitud.fechaCreacion|date('d/m/Y') }}</td>
+                            <td>
+                                <button type="button" class="btn-view" onclick="abrirPanelAprobacion('{{ aprobacion.id }}')">
+                                    <i class="bi bi-pencil-square"></i> Revisar
+                                </button>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center" style="padding: 3rem;">
+                                <p class="text-muted">No tienes aprobaciones pendientes por el momento.</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
 {% endblock %}
