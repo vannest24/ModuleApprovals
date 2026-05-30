@@ -52,6 +52,15 @@ class SolicitudesDcr
         #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'solicitudesDcrs')]
         private Collection $aprobadores;
 
+        #[ORM\OneToOne(inversedBy: 'solicitudesDcr', cascade: ['persist', 'remove'])]
+        private ?Documento $idDocumento = null;
+
+        #[ORM\Column(length: 255)]
+        private ?string $razon_cambio = null;
+
+        #[ORM\Column(length: 255)]
+        private ?string $archivo_adjunto = null;
+
         public function __construct()
         {
             $this->aprobaciones = new ArrayCollection();
@@ -198,6 +207,42 @@ class SolicitudesDcr
     public function removeAprobadore(User $aprobadore): static
     {
         $this->aprobadores->removeElement($aprobadore);
+
+        return $this;
+    }
+
+    public function getIdDocumento(): ?Documento
+    {
+        return $this->idDocumento;
+    }
+
+    public function setIdDocumento(?Documento $idDocumento): static
+    {
+        $this->idDocumento = $idDocumento;
+
+        return $this;
+    }
+
+    public function getRazonCambio(): ?string
+    {
+        return $this->razon_cambio;
+    }
+
+    public function setRazonCambio(string $razon_cambio): static
+    {
+        $this->razon_cambio = $razon_cambio;
+
+        return $this;
+    }
+
+    public function getArchivoAdjunto(): ?string
+    {
+        return $this->archivo_adjunto;
+    }
+
+    public function setArchivoAdjunto(string $archivo_adjunto): static
+    {
+        $this->archivo_adjunto = $archivo_adjunto;
 
         return $this;
     }

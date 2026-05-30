@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UsuarioRepository;
 use App\Entity\User;
+use App\Entity\Area;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UsuarioRepository::class)]
@@ -17,15 +18,13 @@ class Usuario
     #[ORM\Column(length: 255)]
     private ?string $nombre_completo = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $area = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $supervisor = null;
-
     #[ORM\OneToOne(inversedBy: 'usuario', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $id_user_fk = null;
+
+    #[ORM\OneToOne(inversedBy: 'usuario', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'area_id', nullable: false)]
+    private ?Area $areaID = null;
 
     public function getId(): ?int
     {
@@ -43,31 +42,6 @@ class Usuario
 
         return $this;
     }
-
-    public function getArea(): ?string
-    {
-        return $this->area;
-    }
-
-    public function setArea(string $area): static
-    {
-        $this->area = $area;
-
-        return $this;
-    }
-
-    public function getSupervisor(): ?string
-    {
-        return $this->supervisor;
-    }
-
-    public function setSupervisor(?string $supervisor): static
-    {
-        $this->supervisor = $supervisor;
-
-        return $this;
-    }
-
     public function getIdUserFk(): ?User
     {
         return $this->id_user_fk;
@@ -76,6 +50,18 @@ class Usuario
     public function setIdUserFk(User $id_user_fk): static
     {
         $this->id_user_fk = $id_user_fk;
+
+        return $this;
+    }
+
+    public function getAreaID(): ?Area
+    {
+        return $this->areaID;
+    }
+
+    public function setAreaID(?Area $areaID): static
+    {
+        $this->areaID = $areaID;
 
         return $this;
     }
