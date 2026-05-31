@@ -24,9 +24,6 @@ class SolicitudesDcr
     #[ORM\Column(length: 255)]
     private ?string $numero_revision = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $link_sharepoint = null;
-
     #[ORM\Column]
     private ?\DateTimeImmutable $fecha_creacion = null;
 
@@ -57,9 +54,6 @@ class SolicitudesDcr
 
         #[ORM\Column(length: 255)]
         private ?string $razon_cambio = null;
-
-        #[ORM\Column(length: 255)]
-        private ?string $archivo_adjunto = null;
 
         public function __construct()
         {
@@ -93,18 +87,6 @@ class SolicitudesDcr
     public function setNumeroRevision(string $numero_revision): static
     {
         $this->numero_revision = $numero_revision;
-
-        return $this;
-    }
-
-    public function getLinkSharepoint(): ?string
-    {
-        return $this->link_sharepoint;
-    }
-
-    public function setLinkSharepoint(string $link_sharepoint): static
-    {
-        $this->link_sharepoint = $link_sharepoint;
 
         return $this;
     }
@@ -231,18 +213,6 @@ class SolicitudesDcr
     public function setRazonCambio(string $razon_cambio): static
     {
         $this->razon_cambio = $razon_cambio;
-
-        return $this;
-    }
-
-    public function getArchivoAdjunto(): ?string
-    {
-        return $this->archivo_adjunto;
-    }
-
-    public function setArchivoAdjunto(string $archivo_adjunto): static
-    {
-        $this->archivo_adjunto = $archivo_adjunto;
 
         return $this;
     }

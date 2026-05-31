@@ -42,7 +42,7 @@ final class ApprovalHomeController extends AbstractController
                     $aprobacion->setComentarios($request->request->get('comentarios', 'Sin comentarios.'));
                     
                     $entityManager->flush();
-                    $this->addFlash('success', 'Dictamen registrado en el sistema Harman.');
+                    $this->addFlash('success', 'Respuesta registrada correctamente.');
                 }
             }
             return $this->redirectToRoute('app_approval_home');

@@ -4,9 +4,12 @@ namespace App\Controller;
 
 use App\Entity\SolicitudesDcr;
 use App\Entity\Aprobaciones;
+use App\Entity\Documento;
 use App\Entity\User; // Asegúrate de importar la entidad User
 use App\Enum\Estatus;
 use App\Enum\Status;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,16 +39,50 @@ final class OriginHomeController extends AbstractController
         if ($request->isMethod('POST')) {
             $solicitud = new SolicitudesDcr();
             
+            /** @var User $user */
+            $user = $this->getUser();
+
             // Datos básicos del formulario
             $solicitud->setNombreDocumento($request->request->get('nombre_documento'));
             $solicitud->setNumeroRevision($request->request->get('numero_revision'));
-            $solicitud->setLinkSharepoint($request->request->get('link_sharepoint'));
             $solicitud->setFechaLimite(new \DateTimeImmutable($request->request->get('fecha_limite')));
+            
+            // Nuevo campo: Sincronización con el modelo E-R
+            $solicitud->setRazonCambio($request->request->get('razon_cambio'));
+            
+            // Gestión de Archivo Nativo (Sustituye a SharePoint)
+            /** @var UploadedFile $archivoFile */
+            $archivoFile = $request->files->get('documento_file');
+            if ($archivoFile) {
+                $nuevoNombreArchivo = uniqid().'.'.$archivoFile->guessExtension();
+                try {
+                    // Guarda el archivo en el directorio public/uploads/documentos
+                    $archivoFile->move(
+                        $this->getParameter('kernel.project_dir').'/public/uploads/documentos',
+                        $nuevoNombreArchivo
+                    );
+                    
+                    // INSTANCIAR Y RELACIONAR LA NUEVA ENTIDAD DOCUMENTO
+                    $documentoEntity = new Documento();
+                    $documentoEntity->setNombreDocumento($archivoFile->getClientOriginalName()); // Nombre real del archivo subido
+                    $documentoEntity->setRutaArchivo($nuevoNombreArchivo); // Nombre encriptado
+                    
+                    // Asociar el área del usuario (Originador) al Documento
+                    if ($user->getUsuario() && $user->getUsuario()->getAreaID()) {
+                        $documentoEntity->setIDArea($user->getUsuario()->getAreaID());
+                    }
+                    
+                    $solicitud->setIdDocumento($documentoEntity); // Se vincula el documento a la solicitud principal
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Ocurrió un error al guardar el documento en el servidor. Intenta nuevamente.');
+                    return $this->redirectToRoute('app_origin_nuevo');
+                }
+            }
             
             // Datos automáticos
             $solicitud->setFechaCreacion(new \DateTimeImmutable());
             $solicitud->setEstatus(Estatus::ABIERTA); 
-            $solicitud->setOriginador($this->getUser());
+            $solicitud->setOriginador($user);
 
             $entityManager->persist($solicitud);
 
@@ -70,15 +107,13 @@ final class OriginHomeController extends AbstractController
                 }
             }
 
-// ... después de procesar el foreach de aprobadores ...
+            $entityManager->flush();
 
-$entityManager->flush();
+            // Agregamos el mensaje flash que detectará el JavaScript
+            $this->addFlash('registro_exitoso', 'Tu solicitud DCR ha sido enviada correctamente.');
 
-        // Agregamos el mensaje flash que detectará el JavaScript
-        $this->addFlash('registro_exitoso', 'Tu solicitud DCR ha sido enviada correctamente.');
-
-        // REDIRECCIÓN: Es vital para que la sesión se actualice y se muestre el SweetAlert
-        return $this->redirectToRoute('app_origin_historial');
+            // REDIRECCIÓN: Es vital para que la sesión se actualice y se muestre el SweetAlert
+            return $this->redirectToRoute('app_origin_historial');
         }
 
         // 3. PASAR LA VARIABLE A LA VISTA (Esto quita el error de "lista_aprobadores")

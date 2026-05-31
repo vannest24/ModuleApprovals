@@ -13,3 +13,8 @@ A continuación se detallan los cambios y reestructuraciones aplicadas al esquem
 
 3. Extensión de Atributos (Campos Nuevos)
 * Tabla `Solicitudes`: Se añade la columna `Razon_cambio` de tipo alfanumérico para almacenar la justificación obligatoria del Document Change Request (DCR).
+
+4. Actualización de Capa de Entrada de Datos (Controladores)
+* Sincronización de Formularios: Se actualizó `OriginHomeController` para procesar y almacenar el campo `Razon_cambio` enviado mediante POST.
+* Gestión de Archivos Nativos: Se eliminó la dependencia del enlace externo `link_sharepoint`. Se implementó el manejo mediante la clase `UploadedFile` de Symfony para guardar los documentos de manera nativa en el servidor (directorio local del proyecto).
+* Validación de Estados:** Se verificaron las reglas de negocio en `ApprovalHomeController` para garantizar que la transición de los estatus (PENDIENTE, APROBADA, RECHAZADA) reflejen fielmente el nuevo flujo asíncrono.
