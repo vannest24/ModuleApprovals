@@ -1,54 +1,141 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}DCR Aproval System{% endblock %}
+{% block title %}Iniciar Sesión - Approval System{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#006395",
+                        "primary": "#004a71",
+                        "on-surface": "#151c24",
+                        "on-surface-variant": "#40484f",
+                        "surface": "#f7f9ff",
+                        "outline-variant": "#c0c7d0",
+                        "on-primary": "#ffffff",
+                        "outline": "#707880",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    fontFamily: {
+                        "sans": ["'Century Gothic'", "Arial", "sans-serif"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "label-sm": ["14px", {"lineHeight": "20px", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
 {% endblock %}
 
 {% block body %}
-<div class="form-container">
-    <form class="form" method="post">
-        
-        <img src="{{ asset('images/logo_harman.png') }}" alt="Harman Logo">
+<div class="industrial-pattern min-h-screen flex items-center justify-center p-6 font-sans">
+    <main class="w-full max-w-[440px] animate-in fade-in zoom-in duration-500">
+        <div class="login-card bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+            <div class="p-10 space-y-8">
+                <div class="flex flex-col items-center space-y-6">
+                    <div class="h-16 flex items-center justify-center">
+                        <!-- Se respeta la imagen local solicitada -->
+                        <img alt="HARMAN Logo" class="h-16 object-contain" src="{{ asset('images/logo_harman.png') }}"/>
+                    </div>
+                    <div class="text-center">
+                        <h1 class="text-headline-lg text-on-surface">Aprobación de documentos requeridos para DCR</h1>
+                    </div>
+                </div>
+                
+                <form method="post" class="space-y-6">
+                    {% if error %}
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative text-sm mb-4" role="alert">
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        </div>
+                    {% endif %}
 
-        <h4 class="mb-3 text-secondary">Aproval System</h4>
+                    <div class="space-y-2">
+                        <label class="text-label-md text-on-surface-variant block ml-1" for="inputEmail">Correo Electrónico</label>
+                        <div class="relative group">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">mail</span>
+                            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="w-full pl-12 pr-4 py-3 bg-surface border border-outline-variant rounded-lg text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" placeholder="nombre@harman.com" autocomplete="email" required autofocus>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="text-label-md text-on-surface-variant block ml-1" for="inputPassword">Contraseña</label>
+                        <div class="relative group">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">lock</span>
+                            <input type="password" name="password" id="inputPassword" class="w-full pl-12 pr-12 py-3 bg-surface border border-outline-variant rounded-lg text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" placeholder="••••••••" autocomplete="current-password" required>
+                            <button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface-variant transition-colors" type="button" onclick="togglePassword()">
+                                <span class="material-symbols-outlined" id="togglePasswordIcon">visibility</span>
+                            </button>
+                        </div>
+                    </div>
 
-        {% if error %}
-            <div class="alert alert-danger w-100 py-2" style="font-size: 0.85rem;">
-                {{ error.messageKey|trans(error.messageData, 'security') }}
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <div class="flex items-center justify-between py-1">
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <div class="relative flex items-center">
+                                <input type="checkbox" name="_remember_me" id="_remember_me" class="peer h-5 w-5 rounded border-outline-variant text-primary focus:ring-primary transition-all"/>
+                            </div>
+                            <span class="text-label-md text-on-surface-variant group-hover:text-on-surface transition-colors">Mantener sesión iniciada</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" id="loginBtn" class="w-full bg-primary-container text-on-primary py-3.5 px-6 rounded-full text-label-md font-bold shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 mt-8">
+                        <span>Iniciar sesión</span>
+                        <span class="material-symbols-outlined text-[18px]">login</span>
+                    </button>
+                </form>
+                
+                <div class="pt-6 flex flex-col items-center space-y-6">
+                    <div class="flex items-center gap-6 w-full">
+                        <div class="h-[1px] flex-grow bg-outline-variant"></div>
+                        <div class="h-[1px] flex-grow bg-outline-variant"></div>
+                    </div>
+                    <div class="text-center space-y-1">
+                        <p class="text-label-md text-on-surface-variant font-medium">MBU Department - AMEF Area</p>
+                    </div>
+                </div>
             </div>
-        {% endif %}
-
-        <div class="input-span">
-            <label for="inputEmail" class="label">Correo Electrónico</label>
-            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" autocomplete="email" required autofocus placeholder="usuario@harman.com">
         </div>
-
-        <div class="input-span">
-            <label for="inputPassword" class="label">Contraseña</label>
-            <input type="password" name="password" id="inputPassword" autocomplete="current-password" required placeholder="••••••••">
-        </div>
-
-        {# Token CSRF de seguridad #}
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-        <div class="remember-me-container">
-    <label class="checkbox-wrapper">
-        <input type="checkbox" name="_remember_me" id="_remember_me">
-        <span class="checkmark"></span>
-        <span class="label-text">Mantener sesión iniciada</span>
-    </label>
-</div>
         
-        <button class="submit" type="submit">
-            Iniciar sesión
-        </button>
-        
-        <div class="mt-3 text-center">
-            <span class="span">MBU Department - AMEF Area</span>
-        </div>
-    </form>
+    </main>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginBtn = document.getElementById('loginBtn');
+        const form = loginBtn.closest('form');
+        
+        form.addEventListener('submit', () => {
+            const span = loginBtn.querySelector('span:first-child');
+            const icon = loginBtn.querySelector('.material-symbols-outlined');
+            span.textContent = 'Autenticando...';
+            icon.textContent = 'progress_activity';
+            icon.classList.add('animate-spin');
+        });
+    });
+
+    function togglePassword() {
+        const passwordInput = document.getElementById('inputPassword');
+        const toggleIcon = document.getElementById('togglePasswordIcon');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.textContent = 'visibility_off';
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.textContent = 'visibility';
+        }
+    }
+</script>
 {% endblock %}

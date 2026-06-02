@@ -1,46 +1,179 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}DCR Aproval System{% endblock %}
+{% block title %}Inicio{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/menu.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#006395",
+                        "primary": "#004a71",
+                        "on-surface": "#151c24",
+                        "on-surface-variant": "#40484f",
+                        "surface": "#f7f9ff",
+                        "outline-variant": "#c0c7d0",
+                        "on-primary": "#ffffff",
+                        "outline": "#707880",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#cce5ff",
+                        "on-primary-fixed": "#001e31",
+                        "tertiary-fixed": "#d7e3f9",
+                        "on-tertiary-fixed": "#101c2c",
+                        "success-container": "#dcfce7",
+                        "success": "#15803d",
+                        "on-secondary-fixed-variant": "#42474a",
+                        "surface-blue-tint": "rgba(0, 99, 149, 0.04)"
+                    },
+                    fontFamily: {
+                        "sans": ["'Century Gothic'", "Arial", "sans-serif"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "label-sm": ["14px", {"lineHeight": "20px", "fontWeight": "500"}]
+                    },
+                    spacing: {
+                        "xl": "64px",
+                        "lg": "40px",
+                        "md": "24px",
+                        "sm": "12px",
+                        "xs": "4px"
+                    }
+                }
+            }
+        }
+    </script>
 {% endblock %}
 
 {% block body %}
-    <div class="top-bar">
-        <a href="{{ path('app_logout') }}" class="btn-logout">
-            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-        </a>
-    </div>
+<div class="industrial-grid min-h-screen flex flex-col font-sans text-on-surface selection:bg-primary-fixed transition-opacity duration-700 opacity-0" id="main-wrapper">
+    
+    <!-- Top Navigation Bar -->
+<header class="fixed top-0 left-0 w-full h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant flex justify-between items-center px-6 lg:px-10 z-50">
+    
+    <!-- CONTENEDOR IZQUIERDO: Logo -->
+    <div class="flex items-center gap-4"> 
+        <div class="h-12 flex items-center"> 
+            <img alt="Harman Logo" class="h-full object-contain" src="{{ asset('images/logo_harman.png') }}"> 
+        </div> 
+    </div> <!-- ¡MUEVE ESTE CIERRE AQUÍ! -->
 
-    {# 2. EL CONTENIDO PRINCIPAL VA DESPUÉS #}
-    <div class="dashboard-container">
-        <div class="welcome-header">
-            <img src="{{ asset('images/logo_harman.png') }}" alt="Harman Logo" style="max-width: 150px; margin-bottom: 1rem;">
-            <h1>DCR Module</h1>
-            <p>Bienvenido/a, <strong>{{ app.user.usuario.nombreCompleto ?? 'Colaborador' }}</strong>. Selecciona una opción</p>
+    <!-- CONTENEDOR DERECHO: Usuario y Logout (Se irá automáticamente a la derecha) -->
+    <div class="flex items-center gap-3"> 
+        <div class="flex items-center gap-3 px-2 py-1.5 rounded-lg"> 
+            <span class="material-symbols-outlined text-outline" style="font-size: 32px;">account_circle</span> 
+            <span class="hidden lg:inline text-[14px] font-medium text-on-surface">{{ app.user.usuario.nombreCompleto ?? 'Colaborador' }}</span> 
+        </div> 
+        
+        <a href="{{ path('app_logout') }}" class="flex items-center gap-2 px-4 py-2 border border-outline text-on-surface hover:bg-gray-100 transition-all rounded-lg text-[14px] font-medium group"> 
+            <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">logout</span> 
+            <span>Cerrar sesión</span> 
+        </a> 
+    </div> 
+
+</header>
+
+
+    <!-- Main Content Area -->
+    <main class="flex-grow flex flex-col items-center justify-center pt-14 px-6 pb-16 max-w-[1400px] mx-auto w-full">
+        
+        <!-- Welcome Message Section -->
+        <div class="text-center mb-16 space-y-4 max-w-2xl">
+            <h2 class="text-[30px] font-bold text-on-surface tracking-tighter">
+                Aprobaciones de documentos adjuntos requeridos para DCR
+            </h2>
+            <p class="text-[16px] text-on-surface-variant">
+                Bienvenido/a, <span class="font-bold text-on-surface">{{ app.user.usuario.nombreCompleto ?? 'Colaborador' }}</span>. Selecciona una opción.
+            </p>
         </div>
 
-        <div class="menu-grid">
-            {# Tarjeta 1: Nueva Solicitud #}
-            <a href="{{ path('app_origin_nuevo') }}" class="menu-card">
-                <div class="icon-box">
-                    <i class="bi bi-file-earmark-plus"></i>
+        <!-- Main Dashboard Actions Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-5xl">
+            
+            {# Tarjeta 1: Nueva Solicitud (Lógica intacta: app_origin_nuevo) #}
+            <a class="group block relative p-1" href="{{ path('app_origin_nuevo') }}">
+                <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-10 flex flex-col items-center text-center ambient-lift card-hover-state h-full">
+                    <div class="w-20 h-20 rounded-full bg-primary-fixed flex items-center justify-center mb-10 group-hover:scale-110 transition-transform duration-300">
+                        <span class="material-symbols-outlined text-4xl text-on-primary-fixed" style="font-variation-settings: 'FILL' 1;">add_box</span>
+                    </div>
+                    <h3 class="text-[20px] font-semibold text-primary mb-3">
+                        Nueva Solicitud
+                    </h3>
+                    <p class="text-[14px] text-on-surface-variant leading-relaxed">
+                        Crea una nueva solicitud de aprobación de documentos para DCR dentro del ecosistema Harman Industrial.
+                    </p>
+                    <div class="mt-10 inline-flex items-center gap-2 text-primary font-bold text-[14px] group-hover:gap-4 transition-all">
+                        Iniciar solicitud
+                        <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                    </div>
                 </div>
-                <h3>Nueva Solicitud</h3>
-                <p>Crea una nueva solicitud de aprobación de documentos para DCR</p>
+                <!-- Decorative industrial corner accents -->
+                <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-primary/20 rounded-tl-xl"></div>
+                <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-primary/20 rounded-br-xl"></div>
             </a>
 
-            {# Tarjeta 2: Historial #}
-            <a href="{{ path('app_origin_historial') }}" class="menu-card">
-                <div class="icon-box">
-                    <i class="bi bi-clock-history"></i>
+            {# Tarjeta 2: Historial (Lógica intacta: app_origin_historial) #}
+            <a class="group block relative p-1" href="{{ path('app_origin_historial') }}">
+                <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-10 flex flex-col items-center text-center ambient-lift card-hover-state h-full">
+                    <div class="w-20 h-20 rounded-full bg-tertiary-fixed flex items-center justify-center mb-10 group-hover:scale-110 transition-transform duration-300">
+                        <span class="material-symbols-outlined text-4xl text-on-tertiary-fixed">history</span>
+                    </div>
+                    <h3 class="text-[20px] font-semibold text-primary mb-3">
+                        Mi Historial
+                    </h3>
+                    <p class="text-[14px] text-on-surface-variant leading-relaxed">
+                        Consulta el estado actual de tus solicitudes enviadas y el registro histórico de aprobaciones industriales.
+                    </p>
+                    <div class="mt-10 inline-flex items-center gap-2 text-primary font-bold text-[14px] group-hover:gap-4 transition-all">
+                        Ver actividad
+                        <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                    </div>
                 </div>
-                <h3>Mi Historial</h3>
-                <p>Consulta el estado actual de tus solicitudes enviadas.</p>
+                <!-- Decorative industrial corner accents -->
+                <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-primary/20 rounded-tl-xl"></div>
+                <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-primary/20 rounded-br-xl"></div>
             </a>
+
         </div>
-    </div>
+
+    </main>
+
+    <!-- Visual Polish: Decorative Geometric Background Elements -->
+    <div class="fixed -bottom-32 -right-32 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed top-1/2 -left-32 w-64 h-64 bg-surface-blue-tint rounded-full blur-2xl pointer-events-none -z-10"></div>
+
+</div>
+
+<script>
+    // Micro-interactions para las tarjetas
+    document.querySelectorAll('.card-hover-state').forEach(card => {
+        card.addEventListener('mousedown', () => {
+            card.style.transform = 'scale(0.98)';
+        });
+        card.addEventListener('mouseup', () => {
+            card.style.transform = 'translateY(-4px) scale(1)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Animación de entrada
+    window.addEventListener('load', () => {
+        const wrapper = document.getElementById('main-wrapper');
+        setTimeout(() => {
+            wrapper.classList.remove('opacity-0');
+            wrapper.classList.add('opacity-100');
+        }, 50);
+    });
+</script>
 {% endblock %}

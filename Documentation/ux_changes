@@ -1,0 +1,23 @@
+# Registro de Cambios UI/UX - Rediseño de Inicio de Sesión
+
+## Especificaciones de Diseño
+- **Tipografía:** Se inyectó Tailwind via CDN configurando la fuente nativa "Century Gothic" (con "Arial" y "sans-serif" como alternativas fallbacks).
+- **Jerarquía de Tamaños:**
+  - **Títulos principales:** Adaptado a `20px` en variables de configuración Tailwind.
+  - **Cuerpo de contenido y Etiquetas:** Adaptados a `16px` y `14px` dinámicos.
+- **Estilo Visual:** Se reescribió `public/css/login.css` manteniendo el patrón industrial e integrando sombreados sutiles tipo Glassmorphism y spinners interactivos.
+
+## Modificaciones Estructurales (Separación de Capas)
+- Se aprovechó la plantilla `templates/security/login.html.twig` existente:
+  - Se reescribió el contenido utilizando las variables correspondientes sin romper la sintaxis del framework (ej: `name="email"` y `name="password"`).
+- **Manejo de Logo:** Se preservó correctamente `asset('images/logo_harman.png')` haciendo uso del logo anterior con la nueva diagramación.
+
+## Lógica de Autenticación y Enrutamiento
+- **Integración en Archivos Activos:** El rediseño empató con éxito con `src/Security/LoginFormAuthenticator.php` y `UserProvider.php`.
+- **Redirección Basada en Roles:** Se actualizó `LoginFormAuthenticator.php`:
+  - Aprobador (`ROLE_APROBADOR`) -> Redirige dinámicamente a `/approval/home`.
+  - Originador (`ROLE_ORIGINADOR` o default) -> Redirige dinámicamente a `/origin/home`.
+
+## Control de Versiones y Flujo de Trabajo
+- **Rama:** Se continuará subiendo a la rama activa utilizada en el milestone anterior (asociada al modelo E-R).
+- **Restricción de Merge:** Queda **estrictamente prohibido** realizar merges a la rama `main` hasta la finalización y validación del total de actividades de este milestone.

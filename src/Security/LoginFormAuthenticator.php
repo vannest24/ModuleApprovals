@@ -64,8 +64,8 @@ public function onAuthenticationSuccess(Request $request, TokenInterface $token,
         return new RedirectResponse($this->urlGenerator->generate('app_origin_home'));
     }
 
-    // Ruta por defecto si no tiene ninguno de los anteriores
-    return new RedirectResponse($this->urlGenerator->generate('app_dashboard'));
+        // Ruta por defecto garantizada para Originadores
+        return new RedirectResponse($this->urlGenerator->generate('app_origin_home'));
 }
 
     protected function getLoginUrl(Request $request): string

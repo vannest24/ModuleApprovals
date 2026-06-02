@@ -1,0 +1,34 @@
+# Registro de Cambios UI/UX - Rediseño de Inicio de Sesión
+
+## Especificaciones de Diseño
+- **Tipografía:** Se actualizó la fuente principal a "Century Gothic" (con "Arial" y "sans-serif" como alternativas fallbacks).
+- **Jerarquía de Tamaños:**
+  - **Títulos principales:** Ajustado a `20px` (clase `text-headline-lg`).
+  - **Cuerpo de contenido y Etiquetas:** Ajustados a `16px` (clases `text-body-md`, `text-label-md`).
+- **Estilo Visual:** Se mantuvo una línea minimalista e interactiva. Se preservaron los colores corporativos, añadiendo efectos de transición (`focus/hover`) en inputs y botones para mejorar el feedback visual al usuario.
+
+## Modificaciones Estructurales (Separación de Capas)
+- Se refactorizó el código monolítico para aprovechar la estructura de Symfony:
+  - El HTML se integró en la plantilla `templates/security/login.html.twig`, adaptando los tokens de formulario e inputs `_username` y `_password`.
+  - Los estilos de patrón industrial y sombras se separaron al archivo `public/css/login.css`.
+- **Manejo de Logo:** Se preservó el logotipo actual mediante el helper `asset('images/logo.png')` de Symfony, en lugar de utilizar un enlace externo harcodeado.
+
+## Lógica de Autenticación y Enrutamiento
+- **Integración con Base de Datos Docker:** El formulario conecta con el `UserProvider` para validación de credenciales correctamente encriptadas contra el ORM.
+- **Redirección Basada en Roles:** Se construyó `src/EventSubscriber/LoginSuccessSubscriber.php` que intercepta `LoginSuccessEvent` tras el login.
+  - Aprobador (`ROLE_APROBADOR`) -> Redirige dinámicamente a `/approval/home`.
+  - Originador (`ROLE_USER` u otros) -> Redirige dinámicamente a `/origin/home`.
+
+## Control de Versiones y Flujo de Trabajo
+- **Rama:** Se continuará subiendo a la rama activa utilizada en el milestone anterior (asociada al modelo E-R).
+- **Restricción de Merge:** Queda **estrictamente prohibido** realizar merges a la rama `main` hasta la finalización y validación del total de actividades de este milestone.
+
+---
+
+## Módulo del Originador (Nueva Solicitud)
+- **Sincronización de Datos y Layout:** Se integró el diseño "Precision QMS" a la vista `nuevo.html.twig`. Se adoptó el layout lateral (Sidebar) y se parametrizó la top-bar para conectar dinámicamente con las rutas de Symfony (`app_origin_home`, `app_logout`).
+- **Acoplamiento de Backend:** 
+  - Se agregó el campo `razon_cambio` visualmente para emparejar con el cambio del modelo E-R.
+  - Se estructuró el formulario con el atributo `enctype="multipart/form-data"` esencial para transmitir cargas binarias.
+- **Carga de Archivos Nativos:** Se reemplazó el campo obsoleto `link_sharepoint` por un Dropzone estilizado interactivo (`documento_file`), soportando subida nativa y encriptada al servidor local.
+- **Selectores Múltiples:** Se preservó el funcionamiento y robustez de *Tom Select* sobre la variable Twig `aprobadores[]`, pero re-estilizando sus chips y bordes vía CSS interno para fusionarse orgánicamente con Tailwind.

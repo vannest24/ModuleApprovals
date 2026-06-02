@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\User;
 use App\Entity\Usuario;
+use App\Entity\Area;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -26,28 +27,47 @@ class CreateUserCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // Datos: [Email, Roles, Nombre Completo, Área, Supervisor]
+        // Datos: [Email, Roles, Nombre Completo, Nombre del Área]
         $datos = [
-            ['aprobador3@harman.com', ['ROLE_APROBADOR'], 'Aprobador Prod', 'Produccion', 'Gerente Planta'],
-            ['aprobador2@harman.com', ['ROLE_APROBADOR'], 'Aprobador Ing', 'Ingeniería', 'Gerente Planta'],
-            ['aprobador4@harman.com', ['ROLE_APROBADOR'], 'Aprobador Lanzamientos', 'Lanzamientos', 'Director Planta'],
+            ['originador@harman.com', ['ROLE_ORIGINADOR'], 'Originador AMEF', 'AMEF'],
+            ['lanzamientos@harman.com', ['ROLE_APROBADOR'], 'Aprobador Lanzamientos', 'Lanzamientos'],
+            ['calidad@harman.com', ['ROLE_APROBADOR'], 'Aprobador Calidad', 'Calidad'],
+            ['produccion@harman.com', ['ROLE_APROBADOR'], 'Aprobador Produccion', 'Produccion'],
         ];
 
+        $areaRepo = $this->entityManager->getRepository(Area::class);
+        $userRepo = $this->entityManager->getRepository(User::class);
+
         foreach ($datos as $d) {
-            $user = new User();
-            $user->setEmail($d[0]);
-            $user->setRoles($d[1]);
-            $user->setPassword($this->hasher->hashPassword($user, 'password123'));
-            
-            $this->entityManager->persist($user);
+            $email = $d[0];
+            $roles = $d[1];
+            $nombreCompleto = $d[2];
+            $nombreArea = $d[3];
 
-            $perfil = new Usuario();
-            $perfil->setNombreCompleto($d[2]);
-            $perfil->setArea($d[3]);
-            $perfil->setSupervisor($d[4]);
-            $perfil->setIdUserFk($user); 
+            // 1. Buscamos el área o la creamos si no existe
+            $area = $areaRepo->findOneBy(['nombre_area' => $nombreArea]);
+            if (!$area) {
+                $area = new Area();
+                $area->setNombreArea($nombreArea);
+                $this->entityManager->persist($area);
+                $this->entityManager->flush(); // Guardamos para poder usarla
+            }
 
-            $this->entityManager->persist($perfil);
+            // 2. Buscamos al usuario por correo para no duplicar registros si corremos el comando más de una vez
+            $user = $userRepo->findOneBy(['email' => $email]);
+            if (!$user) {
+                $user = new User();
+                $user->setEmail($email);
+                $user->setRoles($roles);
+                $user->setPassword($this->hasher->hashPassword($user, 'password123'));
+                $this->entityManager->persist($user);
+
+                $perfil = new Usuario();
+                $perfil->setNombreCompleto($nombreCompleto);
+                $perfil->setAreaID($area); // Usamos el nuevo método con la entidad Area
+                $perfil->setIdUserFk($user); 
+                $this->entityManager->persist($perfil);
+            }
         }
 
         $this->entityManager->flush();

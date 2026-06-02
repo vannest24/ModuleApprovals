@@ -232,8 +232,8 @@ public function getNombreCompleto(): string
 public function getArea(): string
 {
     if ($this->usuario) {
-        // Ajusta 'getArea' según tu entidad Usuario
-        return $this->usuario->getArea();
+        // Accedemos a la entidad Area relacionada y obtenemos su nombre
+        return $this->usuario->getAreaID() ? $this->usuario->getAreaID()->getNombreArea() : 'Sin Área';
     }
 
     return 'Sin Área';
