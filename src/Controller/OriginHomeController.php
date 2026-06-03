@@ -273,4 +273,47 @@ final class OriginHomeController extends AbstractController
             'lista_aprobadores' => $aprobadores,
         ]);
     }
+
+    #[Route('/origin/eliminar/{id}', name: 'app_origin_eliminar', methods: ['POST'])]
+    public function eliminar(int $id, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $solicitud = $entityManager->getRepository(SolicitudesDcr::class)->find($id);
+
+        if (!$solicitud) {
+            throw $this->createNotFoundException('La solicitud DCR no fue encontrada.');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$solicitud->getId(), $request->request->get('_token'))) {
+            // Verificar nuevamente la regla de negocio para evitar alteraciones externas
+            $algunaRespuesta = false;
+            foreach ($solicitud->getAprobaciones() as $aprobacion) {
+                $estadoAprobacion = strtolower(is_object($aprobacion->getEstatus()) ? $aprobacion->getEstatus()->value : $aprobacion->getEstatus());
+                if ($estadoAprobacion !== 'pendiente') {
+                    $algunaRespuesta = true;
+                    break;
+                }
+            }
+            
+            if ($algunaRespuesta) {
+                $this->addFlash('error', 'No es posible eliminar la solicitud porque uno o más aprobadores ya han emitido una respuesta.');
+                return $this->redirectToRoute('app_origin_detalle', ['id' => $id]);
+            }
+
+            // Eliminar las aprobaciones asociadas
+            foreach ($solicitud->getAprobaciones() as $aprobacion) {
+                $entityManager->remove($aprobacion);
+            }
+
+            // Eliminar la solicitud principal
+            $entityManager->remove($solicitud);
+            $entityManager->flush();
+
+            $this->addFlash('registro_exitoso', 'La solicitud y sus aprobaciones han sido eliminadas correctamente.');
+        } else {
+            $this->addFlash('error', 'Token de seguridad inválido.');
+            return $this->redirectToRoute('app_origin_detalle', ['id' => $id]);
+        }
+
+        return $this->redirectToRoute('app_origin_historial');
+    }
 }

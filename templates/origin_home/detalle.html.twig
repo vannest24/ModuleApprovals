@@ -156,9 +156,8 @@
                                     <span class="material-symbols-outlined font-bold text-[20px]">edit</span>
                                     Editar Solicitud
                                 </a>
-                                <form action="#" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta solicitud? Esta acción no se puede deshacer.');" class="w-full m-0">
-                                    {# Descomentar y ajustar cuando se tenga la ruta en Symfony #}
-                                    {# <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ solicitud.id) }}"> #}
+                                <form action="{{ path('app_origin_eliminar', {'id': solicitud.id}) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta solicitud? Esta acción no se puede deshacer.');" class="w-full m-0">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ solicitud.id) }}">
                                     <button type="submit" class="flex items-center justify-center gap-2 w-full py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-colors shadow-sm text-[14px]">
                                         <span class="material-symbols-outlined font-bold text-[20px]" style="font-variation-settings: 'FILL' 1;">delete</span>
                                         Eliminar Solicitud
