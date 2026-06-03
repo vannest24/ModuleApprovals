@@ -167,8 +167,8 @@
                                 </form>
                             </div>
                         {% else %}
-                            <!-- Resumen de Decisión Emitida -->
-                            <div class="bg-surface-container-lowest rounded-xl custom-shadow p-6 border-t-4 {% if mi_estatus_val == 'aprobada' %}border-green-500{% else %}border-red-500{% endif %}">
+                            <!-- Resumen Estático de Decisión Emitida -->
+                            <div id="decision-summary" class="bg-surface-container-lowest rounded-xl custom-shadow p-6 border-t-4 {% if mi_estatus_val == 'aprobada' %}border-green-500{% else %}border-red-500{% endif %}">
                                 <h3 class="text-[18px] font-bold mb-4 text-on-surface">Decisión Emitida</h3>
                                 <div class="flex items-center px-4 py-3 rounded-lg border {% if mi_estatus_val == 'aprobada' %}bg-[#e8f5e9] border-[#c8e6c9] text-[#1b5e20]{% else %}bg-red-50 border-red-200 text-error{% endif %}">
                                     <div class="flex items-center gap-3">
@@ -178,12 +178,44 @@
                                         <span class="text-[14px] font-bold">Tu respuesta es: {{ mi_respuesta.estatus.value }}</span>
                                     </div>
                                 </div>
-                                {% if mi_respuesta.comentarios %}
+                                {% if mi_respuesta.comentarios and mi_respuesta.comentarios != 'Sin comentarios.' %}
                                     <div class="mt-4 p-3 bg-surface rounded-lg border border-outline-variant/30">
                                         <p class="text-[12px] text-secondary font-medium mb-1">Tus comentarios:</p>
                                         <p class="text-[13px] text-on-surface italic">"{{ mi_respuesta.comentarios }}"</p>
                                     </div>
                                 {% endif %}
+                                <button type="button" onclick="document.getElementById('decision-summary').classList.add('hidden'); document.getElementById('decision-form-container').classList.remove('hidden');" class="mt-4 flex items-center justify-center gap-2 w-full py-2.5 bg-surface border border-outline hover:bg-surface-container text-on-surface rounded-lg font-bold transition-colors shadow-sm text-[14px]">
+                                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                                    Actualizar Decisión
+                                </button>
+                            </div>
+
+                            <!-- Panel de Actualización Dinámico (Oculto por defecto) -->
+                            <div id="decision-form-container" class="hidden bg-surface-container-lowest rounded-xl custom-shadow p-6 border-t-4 {% if mi_estatus_val == 'aprobada' %}border-green-500{% else %}border-red-500{% endif %}">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-[20px] font-bold text-on-surface">Actualizar Decisión</h3>
+                                    <button type="button" onclick="document.getElementById('decision-form-container').classList.add('hidden'); document.getElementById('decision-summary').classList.remove('hidden');" class="text-secondary hover:text-on-surface transition-colors" title="Cancelar">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                                
+                                <form action="{{ path('app_approval_detalle', {'id': solicitud.id}) }}" method="POST" class="space-y-4">
+                                    <input type="hidden" name="solicitud_id" value="{{ solicitud.id }}">
+                                    <div>
+                                        <label for="comentarios" class="block text-[14px] font-medium text-secondary mb-2">Comentarios (Opcional)</label>
+                                        <textarea id="comentarios" name="comentarios" rows="3" placeholder="Escribe tus comentarios aquí..." class="w-full text-[14px] text-on-surface rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary bg-surface resize-none p-3">{% if mi_respuesta.comentarios and mi_respuesta.comentarios != 'Sin comentarios.' %}{{ mi_respuesta.comentarios }}{% endif %}</textarea>
+                                    </div>
+                                    <div class="flex flex-col gap-3">
+                                        <button type="submit" name="accion" value="aprobar" class="flex items-center justify-center gap-2 w-full py-3 {% if mi_estatus_val == 'aprobada' %}bg-green-700 ring-2 ring-green-300 ring-offset-2{% else %}bg-green-600 hover:bg-green-700{% endif %} text-white rounded-lg font-bold transition-colors shadow-sm">
+                                            <span class="material-symbols-outlined font-bold text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                            Actualizar Aprobación
+                                        </button>
+                                        <button type="submit" name="accion" value="rechazar" class="flex items-center justify-center gap-2 w-full py-3 {% if mi_estatus_val == 'rechazada' %}bg-red-700 ring-2 ring-red-300 ring-offset-2{% else %}bg-red-600 hover:bg-red-700{% endif %} text-white rounded-lg font-bold transition-colors shadow-sm">
+                                            <span class="material-symbols-outlined font-bold text-[20px]" style="font-variation-settings: 'FILL' 1;">cancel</span>
+                                            Actualizar Rechazo
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         {% endif %}
                     {% endif %}
