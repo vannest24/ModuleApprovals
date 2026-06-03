@@ -1,161 +1,212 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mi Historial DCR{% endblock %}
+{% block title %}Historial de solicitudes generadas{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/menu.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/historial.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <style>
+        body {
+            font-family: 'Century Gothic', 'Hanken Grotesk', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #bfc7d1; border-radius: 10px; }
+        
+        .card-lifted { box-shadow: 0 30px 60px -12px rgba(0, 99, 149, 0.04); }
+    </style>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#007dba",
+                        "primary": "#006395",
+                        "on-surface": "#111c2d",
+                        "on-surface-variant": "#3f4850",
+                        "surface": "#f9f9ff",
+                        "surface-bright": "#f9f9ff",
+                        "outline-variant": "#bfc7d1",
+                        "on-primary": "#ffffff",
+                        "outline": "#707881",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f0f3ff",
+                        "surface-container": "#e8eeff",
+                        "error": "#ba1a1a"
+                    },
+                    spacing: { "md": "24px", "lg": "40px", "xs": "4px", "sm": "12px", "base": "8px" }
+                }
+            }
+        }
+    </script>
 {% endblock %}
 
 {% block body %}
-    {# Barra superior con Logout #}
-    <div class="top-bar">
-        <a href="{{ path('app_logout') }}" class="btn-logout">
-            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
-        </a>
-    </div>
+<div class="flex min-h-screen bg-surface font-sans">
 
-    <div class="dashboard-container">
-        <div class="table-card">
-            {# BOTÓN DE VOLVER (Posicionado en la esquina superior derecha de la tarjeta blanca) #}
-            <a href="{{ path('app_origin_home') }}" class="btn-back-floating">
-                <i class="bi bi-house-door-fill"></i> <span>Volver al Menú</span>
+    <!-- SideNavBar (Adaptado de la vista de nuevo.html.twig para cohesión) -->
+    <aside class="hidden md:flex flex-col h-full p-base space-y-xs bg-surface-container-low border-r border-outline-variant h-screen w-64 sticky top-0 z-50">
+        <div class="mb-lg px-base mt-4">
+            <h1 class="text-[20px] font-bold text-primary">Opciones</h1>
+        </div>
+        <nav class="flex-1 space-y-xs">
+            <a class="flex items-center gap-base p-base text-on-surface-variant hover:bg-white rounded-lg transition-colors duration-200" href="{{ path('app_origin_home') }}">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-[14px] font-medium">Inicio</span>
             </a>
-
-            {# Mensajes Flash de éxito #}
-            {% for message in app.flashes('exito_historial') %}
-                <div class="alert alert-success alert-dismissible fade show alert-custom" role="alert" style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 0.8rem; margin-bottom: 1.5rem; border: 1px solid #c3e6cb;">
-                    <i class="bi bi-check-circle-fill"></i> {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="float: right; background: none; border: none; cursor: pointer; font-weight: bold;">&times;</button>
+            <a class="flex items-center gap-base p-base text-on-surface-variant hover:bg-white rounded-lg transition-colors duration-200" href="{{ path('app_origin_nuevo') }}">
+                <span class="material-symbols-outlined">post_add</span>
+                <span class="text-[14px] font-medium">Nueva Solicitud</span>
+            </a>
+            <a class="flex items-center gap-base p-base bg-primary-container text-on-primary rounded-lg font-bold opacity-90 transition-all duration-200" href="#">
+                <span class="material-symbols-outlined">history</span>
+                <span class="text-[14px] font-medium">Historial</span>
+            </a>
+        </nav>
+        <div class="pt-base border-t border-outline-variant">
+            <div class="flex items-center gap-sm px-base py-sm">
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary">
+                    <span class="material-symbols-outlined">person</span>
                 </div>
-            {% endfor %}
-
-            <div class="table-header">
-                <i class="bi bi-clock-history"></i>
-                <div>
-                    <h2 class="m-0">Mi Historial</h2>
-                    <p class="text-muted m-0">Seguimiento de tus solicitudes DCR</p>
+                <div class="overflow-hidden">
+                    <p class="text-[14px] font-bold truncate">{{ app.user.usuario.nombreCompleto ?? 'Colaborador' }}</p>
+                    <p class="text-[11px] text-on-surface-variant">Originador</p>
                 </div>
             </div>
+        </div>
+    </aside>
 
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th>Documento</th>
-                        <th>Revisión</th>
-                        <th>Fecha</th>
-                        <th>Estado</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {# USAMOS LOS NOMBRES DE VARIABLES DE TU ENTIDAD #}
-                    {% for solicitud in solicitudes %}
-                        <tr>
-                            <td><strong>{{ solicitud.nombreDocumento }}</strong></td>
-                            <td><span class="text-muted">{{ solicitud.numeroRevision }}</span></td>
-                            <td>{{ solicitud.fechaCreacion|date('d/m/Y') }}</td>
-                            <td>
-                                {# Acceso al valor del Enum Estatus #}
-                                {% set estatus_val = solicitud.estatus.value|lower %}
-                                <span class="status-badge badge-{{ estatus_val }}">
-                                    <i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i>
-                                    {{ solicitud.estatus.value }}
-                                </span>
-                            </td>
-                            <td>
-                                <button type="button" class="btn-view" 
-                                    onclick="verDetalles(
-                                        '{{ solicitud.nombreDocumento|escape('js') }}', 
-                                        '{{ solicitud.numeroRevision|escape('js') }}', 
-                                        '{{ solicitud.fechaCreacion|date('d/m/Y H:i') }}', 
-                                        '{{ solicitud.fechaLimite|date('d/m/Y') }}', 
-                                        '{{ solicitud.estatus.value }}', 
-                                        '{{ solicitud.linkSharepoint|escape('js') }}'
-                                    )">
-                                    <i class="bi bi-eye"></i> Detalles
-                                </button>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="5" class="text-center" style="padding: 3rem;">
-                                <p class="text-muted">No se encontraron solicitudes registradas.</p>
-                            </td>
-                        </tr>
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0">
+        
+        <!-- TopAppBar -->
+        <header class="flex justify-between items-center h-16 px-md w-full sticky top-0 z-40 bg-surface/90 backdrop-blur-sm border-b border-outline-variant">
+            <div class="flex items-center gap-md">
+                <span class="md:hidden material-symbols-outlined cursor-pointer">menu</span>
+            </div>
+            <div class="flex items-center gap-md">
+                <a href="{{ path('app_logout') }}" class="flex items-center gap-2 px-4 py-2 border border-outline text-on-surface hover:bg-gray-100 transition-all rounded-lg text-[14px] font-medium group"> 
+                    <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">logout</span> 
+                    <span>Cerrar sesión</span> 
+                </a> 
+            </div>
+        </header>
+
+        <!-- Canvas -->
+        <main class="flex-1 p-6 lg:p-10 bg-surface-bright">
+            <div class="max-w-[1400px] mx-auto">
+                
+                <!-- Page Header -->
+                <div class="mb-lg flex justify-between items-end">
+                    <div>
+                        <h1 class="text-[30px] font-bold text-on-surface">Historial de solicitudes generadas</h1>
+                    </div>
+                </div>
+
+                {# Flashes unificados y mejorados visualmente #}
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="mb-6 bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined">check_circle</span>
+                                <p class="text-[14px] font-medium">{{ message }}</p>
+                            </div>
+                            <button type="button" onclick="this.parentElement.style.display='none'" class="text-green-800 opacity-70 hover:opacity-100">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+                {% endfor %}
 
-    {# VENTANA MODAL (Oculta por defecto) #}
-    <div id="modalDetalles" class="modal-container">
-        <div class="modal-content card-detalle">
-            <div class="modal-header-detalle">
-                <h3><i class="bi bi-info-circle-fill"></i> Información de la Solicitud</h3>
-                <span class="close-modal" onclick="cerrarModal()">&times;</span>
+                <!-- Table Card -->
+                <div class="bg-surface rounded-xl card-lifted border border-outline-variant overflow-hidden">
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-surface-container-low border-b border-outline-variant">
+                                    <th class="px-md py-4 text-[14px] font-semibold text-on-surface-variant uppercase tracking-wider">ID</th>
+                                    <th class="px-md py-4 text-[14px] font-semibold text-on-surface-variant uppercase tracking-wider">Documento</th>
+                                    <th class="px-md py-4 text-[14px] font-semibold text-on-surface-variant uppercase tracking-wider">Revisión</th>
+                                    <th class="px-md py-4 text-[14px] font-semibold text-on-surface-variant uppercase tracking-wider">Creado / Límite</th>
+                                    <th class="px-md py-4 text-[14px] font-semibold text-on-surface-variant uppercase tracking-wider text-center">Estado</th>
+                                    <th class="px-md py-4 text-[14px] font-semibold text-on-surface-variant uppercase tracking-wider text-right">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-outline-variant">
+                                {% for solicitud in solicitudes %}
+                                    <tr class="hover:bg-surface-container transition-colors group bg-surface-container-lowest">
+                                        <td class="px-md py-5 align-top">
+                                            <span class="font-bold text-primary text-[14px]">#{{ solicitud.id }}</span>
+                                        </td>
+                                        <td class="px-md py-5 align-top">
+                                            <div class="flex flex-col">
+                                                <span class="font-bold text-on-surface text-[14px]">{{ solicitud.nombreDocumento }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-md py-5 align-top">
+                                            <span class="text-[14px] text-on-surface font-medium">{{ solicitud.numeroRevision }}</span>
+                                        </td>
+                                        <td class="px-md py-5 align-top">
+                                            <div class="flex flex-col gap-1">
+                                                <span class="text-[14px] text-on-surface">{{ solicitud.fechaCreacion|date('d/m/Y') }}</span>
+                                                <span class="text-[12px] text-error font-bold">Límite: {{ solicitud.fechaLimite|date('d/m/Y') }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-md py-5 align-top text-center">
+                                            {% set estatus_val = solicitud.estatus.value|lower %}
+                                            {% if estatus_val == 'aprobada' %}
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-[12px] font-bold bg-green-100 text-green-700 border border-green-200">{{ solicitud.estatus.value }}</span>
+                                            {% elseif estatus_val == 'rechazada' %}
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-[12px] font-bold bg-red-100 text-error border border-red-200">{{ solicitud.estatus.value }}</span>
+                                            {% else %}
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-[12px] font-bold bg-[#fff8e1] text-[#b7791f] border border-[#fbe389]">{{ solicitud.estatus.value }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="px-md py-5 align-top text-right">
+                                            <a href="{{ path('app_origin_detalle', {'id': solicitud.id}) }}" 
+                                                class="inline-flex px-4 py-2 bg-primary-container hover:bg-primary text-on-primary rounded-lg text-[14px] font-medium items-center gap-2 ml-auto group-hover:scale-105 transition-all">
+                                                <span class="material-symbols-outlined text-[18px]">fact_check</span>
+                                                Detalles
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="px-md py-12 text-center text-on-surface-variant bg-surface-container-lowest">
+                                            <div class="flex flex-col items-center justify-center gap-2">
+                                                <span class="material-symbols-outlined text-[48px] opacity-50">inbox</span>
+                                                <p class="text-[16px] font-medium mt-2">No se encontraron solicitudes registradas.</p>
+                                                <a href="{{ path('app_origin_nuevo') }}" class="text-primary hover:underline font-medium text-[14px]">Crear una nueva solicitud</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination / Footer Info -->
+                    <div class="bg-surface px-md py-4 border-t border-outline-variant flex items-center justify-between">
+                        <p class="text-[14px] text-on-surface-variant">Mostrando <span class="font-bold">{{ solicitudes|length }}</span> solicitudes generadas</p>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body-detalle">
-                <div class="detalle-item">
-                    <label>Nombre del Documento:</label>
-                    <p id="det-nombre"></p>
-                </div>
-                <div class="detalle-row">
-                    <div class="detalle-item">
-                        <label>Revisión:</label>
-                        <p id="det-revision"></p>
-                    </div>
-                    <div class="detalle-item">
-                        <label>Estatus Actual:</label>
-                        <p id="det-estatus"></p>
-                    </div>
-                </div>
-                <div class="detalle-row">
-                    <div class="detalle-item">
-                        <label>Fecha de Creación:</label>
-                        <p id="det-creacion"></p>
-                    </div>
-                    <div class="detalle-item">
-                        <label>Fecha Límite:</label>
-                        <p id="det-limite"></p>
-                    </div>
-                </div>
-                <hr>
-                <div class="detalle-item text-center">
-                    <label>Acceso al Documento:</label><br>
-                    <a id="det-link" href="#" target="_blank" class="btn-link-sp">
-                        <i class="bi bi-sharepoint"></i> Abrir en SharePoint
-                    </a>
-                </div>
-            </div>
-        </div>
+        </main>
     </div>
+</div>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
-    <script>
-        function verDetalles(nombre, rev, creacion, limite, estatus, link) {
-            document.getElementById('det-nombre').innerText = nombre;
-            document.getElementById('det-revision').innerText = rev;
-            document.getElementById('det-creacion').innerText = creacion;
-            document.getElementById('det-limite').innerText = limite;
-            document.getElementById('det-estatus').innerText = estatus;
-            document.getElementById('det-link').href = link;
-            
-            document.getElementById('modalDetalles').style.display = 'flex';
-        }
-
-        function cerrarModal() {
-            document.getElementById('modalDetalles').style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            let modal = document.getElementById('modalDetalles');
-            if (event.target == modal) { cerrarModal(); }
-        }
-    </script>
 {% endblock %}

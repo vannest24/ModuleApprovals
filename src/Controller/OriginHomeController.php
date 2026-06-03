@@ -38,6 +38,7 @@ final class OriginHomeController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $solicitud = new SolicitudesDcr();
+            $documento = new Documento();
             
             /** @var User $user */
             $user = $this->getUser();
@@ -46,7 +47,7 @@ final class OriginHomeController extends AbstractController
             $solicitud->setNombreDocumento($request->request->get('nombre_documento'));
             $solicitud->setNumeroRevision($request->request->get('numero_revision'));
             $solicitud->setFechaLimite(new \DateTimeImmutable($request->request->get('fecha_limite')));
-            
+            $documento->setNombreDocumento($request->request->get('nombre_documento_adjunto'));
             // Nuevo campo: Sincronización con el modelo E-R
             $solicitud->setRazonCambio($request->request->get('razon_cambio'));
             
@@ -136,6 +137,20 @@ final class OriginHomeController extends AbstractController
 
         return $this->render('origin_home/historial.html.twig', [
             'solicitudes' => $misSolicitudes,
+        ]);
+    }
+
+    #[Route('/origin/detalle/{id}', name: 'app_origin_detalle')]
+    public function detalle(int $id, EntityManagerInterface $entityManager): Response
+    {
+        $solicitud = $entityManager->getRepository(SolicitudesDcr::class)->find($id);
+
+        if (!$solicitud) {
+            throw $this->createNotFoundException('La solicitud DCR no fue encontrada.');
+        }
+
+        return $this->render('origin_home/detalle.html.twig', [
+            'solicitud' => $solicitud,
         ]);
     }
 }

@@ -71,7 +71,7 @@
         <nav class="flex-1 space-y-xs">
             <a class="flex items-center gap-base p-base text-on-surface-variant hover:bg-white rounded-lg transition-colors duration-200" href="{{ path('app_origin_home') }}">
                 <span class="material-symbols-outlined">dashboard</span>
-                <span class="text-[14px] font-medium">Dashboard</span>
+                <span class="text-[14px] font-medium">Inicio</span>
             </a>
             <a class="flex items-center gap-base p-base bg-primary-container text-on-primary rounded-lg font-bold opacity-90 transition-all duration-200" href="#">
                 <span class="material-symbols-outlined">post_add</span>
@@ -130,12 +130,12 @@
                     <form method="POST" action="{{ path('app_origin_nuevo') }}" enctype="multipart/form-data" class="p-6 space-y-6" id="requestForm">
                         <input type="hidden" name="_token" value="{{ csrf_token('solicitud_dcr') }}">
                         
-                        <!-- Row 1: Número de Decorative & Revisión -->
+                        <!-- Row 1: Número de DAC & Revisión -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
                                 {# FIX: antes tenía id="nombre_documento", igual que el campo de abajo #}
-                                <label class="text-[14px] font-medium text-on-surface block px-1" for="numero_decorative">Número de Decorative</label>
-                                <input name="numero_decorative" id="numero_decorative" class="w-full h-[48px] rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-[14px] text-black px-4" placeholder="Ej. DAC-83" required type="text">
+                                <label class="text-[14px] font-medium text-on-surface block px-1" for="numero_decorative">Número de DAC</label>
+                                <input name="nombre_documento" id="nombre_documento" class="w-full h-[48px] rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-[14px] text-black px-4" placeholder="Ej. DAC-83" required type="text">
                             </div>
                             <div class="space-y-2">
                                 <label class="text-[14px] font-medium text-on-surface block px-1" for="numero_revision">Número de Revisión</label>
@@ -157,7 +157,7 @@
                         <!-- Nombre del documento adjunto -->
                         <div class="space-y-2">
                             <label class="text-[14px] font-medium text-on-surface block px-1" for="nombre_documento">Nombre del documento adjunto</label>
-                            <input name="nombre_documento" id="nombre_documento" class="w-full h-[48px] rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-[14px] text-black px-4" placeholder="Ej. FCA-50, Lista de características especiales, etc." required type="text">
+                            <input name="nombre_documento_adjunto" id="nombre_documento_adjunto" class="w-full h-[48px] rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-[14px] text-black px-4" placeholder="Ej. FCA-50, Lista de características especiales, etc." required type="text">
                         </div>
 
                         <!-- Date Picker -->
@@ -166,21 +166,84 @@
                             <input name="fecha_limite" id="fecha_limite" class="w-full h-[48px] rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-[14px] px-4" required type="date">
                         </div>
 
-                        <!-- File Upload -->
-                        <div class="space-y-2">
-                            <label class="text-[14px] font-medium text-on-surface block px-1">Adjuntar documento</label>
-                            <div class="border-2 border-dashed border-outline-variant rounded-xl p-6 bg-surface-container-low hover:bg-surface-container-highest transition-colors relative">
-                                {# FIX: se quita el onchange inline; ahora el listener está en el JS #}
-                                <input type="file" name="documento_file" id="documento_file_input" required accept=".pdf,.doc,.docx,.xls,.xlsx" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                                <div class="flex items-center justify-center gap-3 pointer-events-none">
-                                    <span class="material-symbols-outlined text-primary text-[32px]">upload_file</span>
-                                    <div class="text-left">
-                                        <p class="text-[14px] text-on-surface font-bold" id="file-name">Haz clic o arrastra el archivo aquí</p>
-                                        <p class="text-[11px] text-on-surface-variant">PDF, Word o Excel (Max 10MB)</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <div class="space-y-2">
+            <label class="text-[14px] font-medium text-on-surface block px-1">Adjuntar documento</label>
+            
+            <div id="dropzone-container" class="border-2 border-dashed border-outline-variant rounded-xl p-6 bg-surface-container-low hover:bg-surface-container-highest transition-colors relative">
+                
+                <input type="file" name="documento_file" id="documento_file_input" required accept=".pdf,.doc,.docx,.xls,.xlsx" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                
+                <div class="flex items-center justify-center gap-3 pointer-events-none">
+                    <span class="material-symbols-outlined text-primary text-[32px]" id="file-icon">upload_file</span>
+                    <div class="text-left">
+                        <p class="text-[14px] text-on-surface font-bold" id="file-name">Haz clic o arrastra el archivo aquí</p>
+                        <p class="text-[11px] text-on-surface-variant" id="file-info">PDF, Word o Excel (Max 10MB)</p>
+                    </div>
+                </div>
+
+                <button type="button" id="remove-file-btn" class="hidden absolute right-4 top-1/2 -translate-y-1/2 bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded-full z-20 transition-all">
+                    <span class="material-symbols-outlined text-[18px] block">close</span>
+                </button>
+            </div>
+        </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('documento_file_input');
+            const fileNameText = document.getElementById('file-name');
+            const fileInfoText = document.getElementById('file-info');
+            const fileIcon = document.getElementById('file-icon');
+            const container = document.getElementById('dropzone-container');
+            const removeBtn = document.getElementById('remove-file-btn');
+
+            // Guardamos los textos originales para cuando se limpie el input
+            const originalName = fileNameText.textContent;
+            const originalInfo = fileInfoText.textContent;
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    
+                    // 1. Mostrar el nombre del archivo
+                    fileNameText.textContent = file.name;
+                    
+                    // 2. Calcular y mostrar el tamaño del archivo (convertido a MB)
+                    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                    fileInfoText.textContent = `${fileSizeMB} MB`;
+                    
+                    // 3. Cambiar el icono a uno de "archivo verificado" y cambiar colores a éxito
+                    fileIcon.textContent = 'task_caption'; 
+                    container.classList.remove('border-outline-variant');
+                    container.classList.add('border-green-500', 'bg-green-50/30');
+
+                    // 4. Mostrar botón para remover e invalidar temporalmente el clic del input encima del botón
+                    removeBtn.classList.remove('hidden');
+                    fileInput.classList.remove('w-full');
+                    fileInput.classList.add('w-[calc(100%-60px)]'); // Deja espacio para que el botón de borrar sea clickeable
+                } else {
+                    resetUploadSlot();
+                }
+            });
+
+            // Función para resetear el estado visual si se remueve el archivo
+            removeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                fileInput.value = ''; // Vacía el input file
+                resetUploadSlot();
+            });
+
+            function resetUploadSlot() {
+                fileNameText.textContent = originalName;
+                fileInfoText.textContent = originalInfo;
+                fileIcon.textContent = 'upload_file';
+                container.classList.add('border-outline-variant');
+                container.classList.remove('border-green-500', 'bg-green-50/30');
+                removeBtn.classList.add('hidden');
+                fileInput.classList.remove('w-[calc(100%-60px)]');
+                fileInput.classList.add('w-full');
+            }
+        });
+        </script>
 
                         <!-- Extracción de Áreas Únicas -->
                         {% set areas_unicas = [] %}
@@ -275,25 +338,49 @@
     {{ parent() }}
     <script>
         // ── Auto-resize del textarea ──────────────────────────────────────────────
-        document.getElementById('razon_cambio').addEventListener('input', function () {
-            this.style.height = 'auto';
-            this.style.height = this.scrollHeight + 'px';
-        });
+        const razonCambio = document.getElementById('razon_cambio');
+        if (razonCambio) {
+            razonCambio.addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
+        }
 
         // ── Mostrar nombre del archivo seleccionado ───────────────────────────────
-        document.getElementById('documento_file_input').addEventListener('change', function () {
-            const name = this.files[0]?.name || 'Haz clic o arrastra el archivo aquí';
-            document.getElementById('file-name').textContent = name;
-        });
+        const fileInput = document.getElementById('documento_file_input');
+        const fileNameDisplay = document.getElementById('file-name');
+        
+        if (fileInput && fileNameDisplay) {
+            const fileContainer = fileInput.parentElement;
+            fileInput.addEventListener('change', function (e) {
+                if (e.target.files && e.target.files.length > 0) {
+                    fileNameDisplay.textContent = e.target.files[0].name;
+                    fileNameDisplay.classList.replace('text-on-surface', 'text-primary');
+                    fileContainer.classList.remove('border-outline-variant', 'bg-surface-container-low');
+                    fileContainer.classList.add('border-primary', 'bg-primary/5');
+                } else {
+                    fileNameDisplay.textContent = 'Haz clic o arrastra el archivo aquí';
+                    fileNameDisplay.classList.replace('text-primary', 'text-on-surface');
+                    fileContainer.classList.add('border-outline-variant', 'bg-surface-container-low');
+                    fileContainer.classList.remove('border-primary', 'bg-primary/5');
+                }
+            });
+        }
 
         // ── Loader al enviar el formulario ────────────────────────────────────────
-        document.getElementById('requestForm').addEventListener('submit', function () {
-            const btn = this.querySelector('button[type="submit"]');
-            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Procesando...';
-            btn.classList.add('opacity-80', 'pointer-events-none');
-        });
+        // Corregido para buscar la etiqueta 'form' directamente si no tiene ID
+        const formElement = document.getElementById('requestForm') || document.querySelector('form');
+        if (formElement) {
+            formElement.addEventListener('submit', function () {
+                const btn = this.querySelector('button[type="submit"]');
+                if (btn) {
+                    btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Procesando...';
+                    btn.classList.add('opacity-80', 'pointer-events-none');
+                }
+            });
+        }
 
-        // ── Referencias ───────────────────────────────────────────────────────────
+        // ── Referencias Elementos UI ──────────────────────────────────────────────
         const areaCheckboxes       = document.querySelectorAll('.area-checkbox');
         const areaLabels           = document.querySelectorAll('.area-label');
         const approverLabels       = document.querySelectorAll('.approver-label');
@@ -303,53 +390,62 @@
 
         // ── Contadores ────────────────────────────────────────────────────────────
         function updateCounts() {
-            document.getElementById('areas-count').textContent =
-                `${Array.from(areaCheckboxes).filter(cb => cb.checked).length} áreas seleccionadas`;
-            document.getElementById('approvers-count').textContent =
-                `${Array.from(approverCheckboxes).filter(cb => cb.checked).length} personas seleccionadas`;
+            const selectedAreasCount = Array.from(areaCheckboxes).filter(cb => cb.checked).length;
+            const selectedApproversCount = Array.from(approverCheckboxes).filter(cb => cb.checked).length;
+
+            document.getElementById('areas-count').textContent = 
+                `${selectedAreasCount} ${selectedAreasCount === 1 ? 'área seleccionada' : 'áreas seleccionadas'}`;
+            
+            document.getElementById('approvers-count').textContent = 
+                `${selectedApproversCount} ${selectedApproversCount === 1 ? 'persona seleccionada' : 'personas seleccionadas'}`;
         }
 
-        // ── Filtrar aprobadores ───────────────────────────────────────────────────
-        // Reglas:
-        //   · Sin áreas marcadas  → mostrar todos
-        //   · Con áreas marcadas  → solo los de esas áreas
-        //   · El texto del buscador refina sobre el resultado anterior
+        // ── Filtrar aprobadores según áreas seleccionadas y buscador ──────────────
         function filterApprovers() {
+            // Obtener lista de áreas seleccionadas en minúsculas
             const selectedAreas = Array.from(areaCheckboxes)
                 .filter(cb => cb.checked)
-                .map(cb => cb.value.toLowerCase());
+                .map(cb => cb.value.trim().toLowerCase());
 
             const searchText = filterApproversInput.value.trim().toLowerCase();
 
             approverLabels.forEach(label => {
-                const area = label.dataset.area || '';
-                const name = label.dataset.name || '';
+                const areaAttr = (label.dataset.area || '').trim().toLowerCase();
+                const nameAttr = (label.dataset.name || '').trim().toLowerCase();
 
-                const matchesArea = selectedAreas.length === 0 || selectedAreas.includes(area);
-                const matchesText = searchText === '' || name.includes(searchText) || area.includes(searchText);
+                // Regla solicitada: Si no hay áreas seleccionadas se muestran todos, si hay, solo los de esa área
+                const matchesArea = selectedAreas.length === 0 || selectedAreas.includes(areaAttr);
+                const matchesText = searchText === '' || nameAttr.includes(searchText) || areaAttr.includes(searchText);
 
-                label.style.display = (matchesArea && matchesText) ? 'flex' : 'none';
+                if (matchesArea && matchesText) {
+                    label.style.setProperty('display', 'flex', 'important');
+                } else {
+                    label.style.setProperty('display', 'none', 'important');
+                }
             });
         }
 
-        // ── Filtrar lista de áreas ────────────────────────────────────────────────
+        // ── Filtrar lista de áreas mediante su buscador ───────────────────────────
         function filterAreas() {
             const text = filterAreasInput.value.trim().toLowerCase();
             areaLabels.forEach(label => {
-                label.style.display = (label.dataset.area || '').includes(text) ? 'flex' : 'none';
+                const areaAttr = (label.dataset.area || '').trim().toLowerCase();
+                label.style.display = areaAttr.includes(text) ? 'flex' : 'none';
             });
         }
 
-        // ── Listener: checkboxes de área ──────────────────────────────────────────
+        // ── Eventos: Selección de Áreas ───────────────────────────────────────────
         areaCheckboxes.forEach(cb => {
             cb.addEventListener('change', () => {
-                // Al desmarcar un área, desmarcar también a sus aprobadores
+                // Al desmarcar un área, se limpian y desmarcan los aprobadores ocultados de dicha área
                 if (!cb.checked) {
-                    const areaVal = cb.value.toLowerCase();
+                    const areaVal = cb.value.trim().toLowerCase();
                     approverLabels.forEach(label => {
                         if (label.dataset.area === areaVal) {
                             const apCb = label.querySelector('.approver-checkbox');
-                            apCb.checked = false;
+                            if (apCb) apCb.checked = false;
+                            
+                            // Resetear estilos visuales de la fila
                             label.classList.remove('bg-primary/5', 'border-primary/20');
                             label.classList.add('border-transparent');
                         }
@@ -360,22 +456,44 @@
             });
         });
 
-        // ── Listener: checkboxes de aprobadores (estilo visual) ───────────────────
+        // ── Eventos: Selección de Aprobadores ─────────────────────────────────────
         approverCheckboxes.forEach(cb => {
-            cb.addEventListener('change', e => {
+            cb.addEventListener('change', (e) => {
                 const label = e.target.closest('.approver-label');
-                label.classList.toggle('bg-primary/5',    e.target.checked);
-                label.classList.toggle('border-primary/20', e.target.checked);
-                label.classList.toggle('border-transparent', !e.target.checked);
+                if (label) {
+                    if (e.target.checked) {
+                        label.classList.add('bg-primary/5', 'border-primary/20');
+                        label.classList.remove('border-transparent');
+                    } else {
+                        label.classList.remove('bg-primary/5', 'border-primary/20');
+                        label.classList.add('border-transparent');
+                    }
+                }
                 updateCounts();
             });
         });
 
-        // ── Listeners: inputs de búsqueda ─────────────────────────────────────────
+        // Evitar el doble click dañino nativo de las etiquetas `<label>` en cascada
+        approverLabels.forEach(label => {
+            label.addEventListener('click', (e) => {
+                // Si el click no fue directamente en el checkbox, nosotros lo controlamos manualmente
+                if (e.target.type !== 'checkbox') {
+                    e.preventDefault();
+                    const cb = label.querySelector('.approver-checkbox');
+                    if (cb) {
+                        cb.checked = !cb.checked;
+                        // Forzar el disparo del evento change para actualizar contadores y estilos
+                        cb.dispatchEvent(new Event('change'));
+                    }
+                }
+            });
+        });
+
+        // ── Listeners de Inputs de Texto ──────────────────────────────────────────
         filterAreasInput.addEventListener('input', filterAreas);
         filterApproversInput.addEventListener('input', filterApprovers);
 
-        // ── Inicialización ────────────────────────────────────────────────────────
+        // ── Inicialización Inicial en Carga ───────────────────────────────────────
         updateCounts();
         filterApprovers();
     </script>
