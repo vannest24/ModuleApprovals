@@ -16,7 +16,14 @@
             <li><strong>Razón del cambio:</strong> {{ solicitud.razonCambio }}</li>
         </ul>
         
-        <p style="margin-top: 20px;">Por favor, ingresa a la plataforma para emitir tu dictamen antes de la fecha límite.</p>
-    </div>
+        <p style="margin-top: 20px;">Por favor, ingresa a la plataforma para emitir tu respuesta antes de la fecha límite.</p>
+
+        <div style="text-align: center; margin-top: 25px; margin-bottom: 10px;">
+            <a href="http://localhost:8000/approval/detalle/{solicitud.id }" 
+               style="background-color: #007bc0; color: white; padding: 12px 25px; text-decoration: none; font-weight: bold; border-radius: 5px; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
+                Revisar Solicitud
+            </a>
+        </div>
+        </div>
 </body>
 </html>
