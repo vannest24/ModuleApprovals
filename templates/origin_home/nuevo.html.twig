@@ -187,64 +187,6 @@
             </div>
         </div>
 
-        <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const fileInput = document.getElementById('documento_file_input');
-            const fileNameText = document.getElementById('file-name');
-            const fileInfoText = document.getElementById('file-info');
-            const fileIcon = document.getElementById('file-icon');
-            const container = document.getElementById('dropzone-container');
-            const removeBtn = document.getElementById('remove-file-btn');
-
-            // Guardamos los textos originales para cuando se limpie el input
-            const originalName = fileNameText.textContent;
-            const originalInfo = fileInfoText.textContent;
-
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    
-                    // 1. Mostrar el nombre del archivo
-                    fileNameText.textContent = file.name;
-                    
-                    // 2. Calcular y mostrar el tamaño del archivo (convertido a MB)
-                    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                    fileInfoText.textContent = `${fileSizeMB} MB`;
-                    
-                    // 3. Cambiar el icono a uno de "archivo verificado" y cambiar colores a éxito
-                    fileIcon.textContent = 'task_caption'; 
-                    container.classList.remove('border-outline-variant');
-                    container.classList.add('border-green-500', 'bg-green-50/30');
-
-                    // 4. Mostrar botón para remover e invalidar temporalmente el clic del input encima del botón
-                    removeBtn.classList.remove('hidden');
-                    fileInput.classList.remove('w-full');
-                    fileInput.classList.add('w-[calc(100%-60px)]'); // Deja espacio para que el botón de borrar sea clickeable
-                } else {
-                    resetUploadSlot();
-                }
-            });
-
-            // Función para resetear el estado visual si se remueve el archivo
-            removeBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                fileInput.value = ''; // Vacía el input file
-                resetUploadSlot();
-            });
-
-            function resetUploadSlot() {
-                fileNameText.textContent = originalName;
-                fileInfoText.textContent = originalInfo;
-                fileIcon.textContent = 'upload_file';
-                container.classList.add('border-outline-variant');
-                container.classList.remove('border-green-500', 'bg-green-50/30');
-                removeBtn.classList.add('hidden');
-                fileInput.classList.remove('w-[calc(100%-60px)]');
-                fileInput.classList.add('w-full');
-            }
-        });
-        </script>
-
                         <!-- Extracción de Áreas Únicas -->
                         {% set areas_unicas = [] %}
                         {% for aprobador in lista_aprobadores %}
@@ -347,25 +289,57 @@
         }
 
         // ── Mostrar nombre del archivo seleccionado ───────────────────────────────
-        const fileInput = document.getElementById('documento_file_input');
-        const fileNameDisplay = document.getElementById('file-name');
-        
-        if (fileInput && fileNameDisplay) {
-            const fileContainer = fileInput.parentElement;
-            fileInput.addEventListener('change', function (e) {
-                if (e.target.files && e.target.files.length > 0) {
-                    fileNameDisplay.textContent = e.target.files[0].name;
-                    fileNameDisplay.classList.replace('text-on-surface', 'text-primary');
-                    fileContainer.classList.remove('border-outline-variant', 'bg-surface-container-low');
-                    fileContainer.classList.add('border-primary', 'bg-primary/5');
-                } else {
-                    fileNameDisplay.textContent = 'Haz clic o arrastra el archivo aquí';
-                    fileNameDisplay.classList.replace('text-primary', 'text-on-surface');
-                    fileContainer.classList.add('border-outline-variant', 'bg-surface-container-low');
-                    fileContainer.classList.remove('border-primary', 'bg-primary/5');
+        (function() {
+            const fileInput = document.getElementById('documento_file_input');
+            const fileNameText = document.getElementById('file-name');
+            const fileInfoText = document.getElementById('file-info');
+            const fileIcon = document.getElementById('file-icon');
+            const container = document.getElementById('dropzone-container');
+            const removeBtn = document.getElementById('remove-file-btn');
+
+            if (fileInput && fileNameText && fileInfoText && fileIcon && container && removeBtn) {
+                const originalName = fileNameText.textContent;
+                const originalInfo = fileInfoText.textContent;
+
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        fileNameText.textContent = file.name;
+                        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                        fileInfoText.textContent = `${fileSizeMB} MB`;
+                        
+                        fileIcon.textContent = 'task_caption'; 
+                        fileNameText.classList.replace('text-on-surface', 'text-green-700');
+                        container.classList.remove('border-outline-variant', 'bg-surface-container-low');
+                        container.classList.add('border-green-500', 'bg-green-50/30');
+
+                        removeBtn.classList.remove('hidden');
+                        fileInput.classList.remove('w-full');
+                        fileInput.classList.add('w-[calc(100%-60px)]');
+                    } else {
+                        resetUploadSlot();
+                    }
+                });
+
+                removeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    fileInput.value = '';
+                    resetUploadSlot();
+                });
+
+                function resetUploadSlot() {
+                    fileNameText.textContent = originalName;
+                    fileInfoText.textContent = originalInfo;
+                    fileIcon.textContent = 'upload_file';
+                    fileNameText.classList.replace('text-green-700', 'text-on-surface');
+                    container.classList.add('border-outline-variant', 'bg-surface-container-low');
+                    container.classList.remove('border-green-500', 'bg-green-50/30');
+                    removeBtn.classList.add('hidden');
+                    fileInput.classList.remove('w-[calc(100%-60px)]');
+                    fileInput.classList.add('w-full');
                 }
-            });
-        }
+            }
+        })();
 
         // ── Loader al enviar el formulario ────────────────────────────────────────
         // Corregido para buscar la etiqueta 'form' directamente si no tiene ID
