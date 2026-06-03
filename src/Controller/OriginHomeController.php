@@ -165,4 +165,112 @@ final class OriginHomeController extends AbstractController
             'solicitud' => $solicitud,
         ]);
     }
+
+    #[Route('/origin/editar/{id}', name: 'app_origin_editar')]
+    public function editar(int $id, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $solicitud = $entityManager->getRepository(SolicitudesDcr::class)->find($id);
+
+        if (!$solicitud) {
+            throw $this->createNotFoundException('La solicitud DCR no fue encontrada.');
+        }
+
+        // Obtener estatus de forma segura (verifica si es objeto Enum o string)
+        $estatusActual = strtolower(is_object($solicitud->getEstatus()) ? $solicitud->getEstatus()->value : $solicitud->getEstatus());
+        
+        if ($estatusActual !== 'abierta' && $estatusActual !== 'pendiente') {
+            $this->addFlash('error', 'No es posible editar una solicitud que ya está ' . $estatusActual . '.');
+            return $this->redirectToRoute('app_origin_detalle', ['id' => $id]);
+        }
+
+        // NUEVA REGLA DE NEGOCIO: Verificar si algún aprobador ya respondió
+        $algunaRespuesta = false;
+        foreach ($solicitud->getAprobaciones() as $aprobacion) {
+            $estadoAprobacion = strtolower(is_object($aprobacion->getEstatus()) ? $aprobacion->getEstatus()->value : $aprobacion->getEstatus());
+            if ($estadoAprobacion !== 'pendiente') {
+                $algunaRespuesta = true;
+                break;
+            }
+        }
+        
+        if ($algunaRespuesta) {
+            $this->addFlash('error', 'No es posible editar la solicitud porque uno o más aprobadores ya han emitido una respuesta.');
+            return $this->redirectToRoute('app_origin_detalle', ['id' => $id]);
+        }
+
+        $aprobadores = $entityManager->getRepository(User::class)
+            ->createQueryBuilder('u')
+            ->where('u.roles LIKE :role')
+            ->setParameter('role', '%ROLE_APROBADOR%')
+            ->getQuery()
+            ->getResult();
+
+        if ($request->isMethod('POST')) {
+            $solicitud->setNombreDocumento($request->request->get('nombre_documento'));
+            $solicitud->setNumeroRevision($request->request->get('numero_revision'));
+            $solicitud->setFechaLimite(new \DateTimeImmutable($request->request->get('fecha_limite')));
+            $solicitud->setRazonCambio($request->request->get('razon_cambio'));
+
+            $documentoEntity = $solicitud->getIdDocumento();
+            if ($documentoEntity) {
+                $documentoEntity->setNombreDocumento($request->request->get('nombre_documento_adjunto'));
+            }
+
+            // Gestión de Archivo Nativo (Solo si se sube uno nuevo para reemplazarlo)
+            /** @var UploadedFile $archivoFile */
+            $archivoFile = $request->files->get('documento_file');
+            if ($archivoFile) {
+                $nuevoNombreArchivo = uniqid().'.'.$archivoFile->guessExtension();
+                try {
+                    $archivoFile->move($this->getParameter('kernel.project_dir').'/public/uploads/documentos', $nuevoNombreArchivo);
+                    if (!$documentoEntity) {
+                        $documentoEntity = new Documento();
+                        $solicitud->setIdDocumento($documentoEntity);
+                    }
+                    $nombreAdjunto = $request->request->get('nombre_documento_adjunto');
+                    $documentoEntity->setNombreDocumento($nombreAdjunto ? $nombreAdjunto : $archivoFile->getClientOriginalName());
+                    $documentoEntity->setRutaArchivo($nuevoNombreArchivo);
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Ocurrió un error al guardar el documento actualizado.');
+                }
+            }
+
+            // Gestionar Aprobadores (Elimina los deseleccionados y añade los nuevos)
+            $idsAprobadoresSeleccionados = $request->request->all('aprobadores') ?? [];
+            $aprobacionesExistentes = $solicitud->getAprobaciones();
+            $aprobadoresActualesIds = [];
+            
+            foreach ($aprobacionesExistentes as $aprobacion) {
+                $aprobadorId = $aprobacion->getAprobador()->getId();
+                $aprobadoresActualesIds[] = $aprobadorId;
+                if (!in_array($aprobadorId, $idsAprobadoresSeleccionados)) {
+                    $entityManager->remove($aprobacion);
+                    $solicitud->removeAprobadore($aprobacion->getAprobador());
+                }
+            }
+            foreach ($idsAprobadoresSeleccionados as $idNuevoAprobador) {
+                if (!in_array($idNuevoAprobador, $aprobadoresActualesIds)) {
+                    $userAprobador = $entityManager->getRepository(User::class)->find($idNuevoAprobador);
+                    if ($userAprobador) {
+                        $nuevaAprobacion = new Aprobaciones();
+                        $nuevaAprobacion->setSolicitud($solicitud);
+                        $nuevaAprobacion->setAprobador($userAprobador);
+                        $nuevaAprobacion->setEstatus(Status::PENDIENTE);
+                        $nuevaAprobacion->setComentarios('Pendiente de revisión (Añadido en edición)');
+                        $entityManager->persist($nuevaAprobacion);
+                        $solicitud->addAprobadore($userAprobador);
+                    }
+                }
+            }
+
+            $entityManager->flush();
+            $this->addFlash('registro_exitoso', 'La solicitud DCR se actualizó correctamente.');
+            return $this->redirectToRoute('app_origin_detalle', ['id' => $solicitud->getId()]);
+        }
+
+        return $this->render('origin_home/editar.html.twig', [
+            'solicitud' => $solicitud,
+            'lista_aprobadores' => $aprobadores,
+        ]);
+    }
 }

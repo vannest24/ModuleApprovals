@@ -1,0 +1,307 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar solicitud #{{ solicitud.id }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#007dba", "primary": "#006395", "on-surface": "#111c2d",
+                        "on-surface-variant": "#3f4850", "surface": "#f9f9ff", "outline-variant": "#bfc7d1",
+                        "on-primary": "#ffffff", "outline": "#707881", "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f0f3ff", "primary-fixed": "#cbe6ff", "tertiary-fixed": "#d7e3f9",
+                        "error": "#ba1a1a"
+                    },
+                    fontFamily: { "sans": ["'Century Gothic'", "Arial", "sans-serif"] },
+                    spacing: { "xl": "64px", "lg": "40px", "md": "24px", "sm": "12px", "xs": "4px", "base": "8px" }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin { animation: spin 1s linear infinite; display: inline-block; }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="flex min-h-screen bg-surface font-sans">
+    <!-- SideNavBar -->
+    <aside class="hidden md:flex flex-col h-full p-base space-y-xs bg-surface-container-low border-r border-outline-variant h-screen w-64 sticky top-0 z-50">
+        <div class="mb-lg px-base mt-4">
+            <h1 class="text-[20px] font-bold text-primary">Opciones</h1>
+        </div>
+        <nav class="flex-1 space-y-xs">
+            <a class="flex items-center gap-base p-base text-on-surface-variant hover:bg-white rounded-lg transition-colors duration-200" href="{{ path('app_origin_home') }}">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-[14px] font-medium">Inicio</span>
+            </a>
+            <a class="flex items-center gap-base p-base bg-primary-container text-on-primary rounded-lg font-bold opacity-90 transition-all duration-200" href="#">
+                <span class="material-symbols-outlined">edit</span>
+                <span class="text-[14px] font-medium">Editar Solicitud</span>
+            </a>
+            <a class="flex items-center gap-base p-base text-on-surface-variant hover:bg-white rounded-lg transition-colors duration-200" href="{{ path('app_origin_historial') }}">
+                <span class="material-symbols-outlined">history</span>
+                <span class="text-[14px] font-medium">Historial</span>
+            </a>
+        </nav>
+        <div class="pt-base border-t border-outline-variant">
+            <div class="flex items-center gap-sm px-base py-sm">
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary">
+                    <span class="material-symbols-outlined">person</span>
+                </div>
+                <div class="overflow-hidden">
+                    <p class="text-[14px] font-bold truncate">{{ app.user.usuario.nombreCompleto ?? 'Colaborador' }}</p>
+                    <p class="text-[11px] text-on-surface-variant">Originador</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0">
+        <header class="flex justify-between items-center h-16 px-md w-full sticky top-0 z-40 bg-surface/90 backdrop-blur-sm border-b border-outline-variant">
+            <div class="flex items-center gap-md">
+                <span class="md:hidden material-symbols-outlined cursor-pointer">menu</span>
+            </div>
+            <div class="flex items-center gap-md">
+                <a href="{{ path('app_logout') }}" class="flex items-center gap-2 px-4 py-2 border border-outline text-on-surface hover:bg-gray-100 transition-all rounded-lg text-[14px] font-medium group"> 
+                    <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">logout</span> Cerrar sesión 
+                </a> 
+            </div>
+        </header>
+
+        <!-- Canvas -->
+        <main class="flex-1 p-6 lg:p-10 flex justify-center">
+            <div class="w-full max-w-[640px]">
+                
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                        <span class="material-symbols-outlined text-[32px]">edit_document</span>
+                    </div>
+                    <div>
+                        <h1 class="text-[24px] font-bold text-on-surface">Editar Solicitud #{{ solicitud.id }}</h1>
+                        <a href="{{ path('app_origin_detalle', {'id': solicitud.id}) }}" class="text-[13px] text-primary hover:underline flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[14px]">arrow_back</span> Volver a detalles</a>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-[0_30px_60px_-15px_rgba(0,99,149,0.04)] border-t-4 border-primary overflow-hidden">
+                    <form method="POST" action="{{ path('app_origin_editar', {'id': solicitud.id}) }}" enctype="multipart/form-data" class="p-6 space-y-6" id="requestForm">
+                        <input type="hidden" name="_token" value="{{ csrf_token('solicitud_dcr') }}">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-[14px] font-medium text-on-surface block px-1">Número de DAC</label>
+                                <input name="nombre_documento" class="w-full h-[48px] rounded-lg border-outline-variant focus:border-primary focus:ring-1 text-[14px] text-black px-4" value="{{ solicitud.nombreDocumento }}" required type="text">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[14px] font-medium text-on-surface block px-1">Número de Revisión</label>
+                                <input name="numero_revision" class="w-full h-[48px] rounded-lg border-outline-variant focus:border-primary focus:ring-1 text-[14px] text-black px-4" value="{{ solicitud.numeroRevision }}" required type="text">
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[14px] font-medium text-on-surface block px-1">Razón del Cambio</label>
+                            <textarea name="razon_cambio" id="razon_cambio" class="w-full min-h-[48px] max-h-[200px] py-3 px-4 rounded-lg border-outline-variant focus:border-primary focus:ring-1 text-[14px] text-black resize-none overflow-hidden" required rows="2">{{ solicitud.razonCambio }}</textarea>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[14px] font-medium text-on-surface block px-1">Nombre del documento adjunto</label>
+                            <input name="nombre_documento_adjunto" class="w-full h-[48px] rounded-lg border-outline-variant focus:border-primary focus:ring-1 text-[14px] text-black px-4" value="{{ solicitud.idDocumento ? solicitud.idDocumento.nombreDocumento : '' }}" required type="text">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[14px] font-medium text-on-surface block px-1">Fecha Límite de Aprobación</label>
+                            <input name="fecha_limite" class="w-full h-[48px] rounded-lg border-outline-variant focus:border-primary focus:ring-1 text-[14px] px-4" value="{{ solicitud.fechaLimite|date('Y-m-d') }}" required type="date">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[14px] font-medium text-on-surface block px-1">Actualizar documento adjunto (Opcional)</label>
+                            <div id="dropzone-container" class="border-2 border-dashed border-outline-variant rounded-xl p-6 bg-surface-container-low hover:bg-surface-container-highest transition-colors relative">
+                                {# No le ponemos Required porque puede no querer cambiar el documento original #}
+                                <input type="file" name="documento_file" id="documento_file_input" accept=".pdf,.doc,.docx,.xls,.xlsx" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                
+                                <div class="flex items-center justify-center gap-3 pointer-events-none">
+                                    <span class="material-symbols-outlined text-primary text-[32px]" id="file-icon">description</span>
+                                    <div class="text-left">
+                                        <p class="text-[14px] text-on-surface font-bold" id="file-name">
+                                            {% if solicitud.idDocumento %}Archivo actual: {{ solicitud.idDocumento.nombreDocumento }}{% else %}Haz clic o arrastra el archivo aquí{% endif %}
+                                        </p>
+                                        <p class="text-[11px] text-on-surface-variant" id="file-info">Solo sube un archivo si deseas reemplazar el actual</p>
+                                    </div>
+                                </div>
+
+                                <button type="button" id="remove-file-btn" class="hidden absolute right-4 top-1/2 -translate-y-1/2 bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded-full z-20 transition-all">
+                                    <span class="material-symbols-outlined text-[18px] block">close</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Approvers Selector -->
+                        {% set aprobadores_ids = [] %}
+                        {% for aprobacion in solicitud.aprobaciones|default([]) %}
+                            {% set aprobadores_ids = aprobadores_ids|merge([aprobacion.aprobador.id]) %}
+                        {% endfor %}
+                        
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-end px-1">
+                                <label class="text-[14px] font-medium text-on-surface">Gestionar Aprobadores</label>
+                                <span id="approvers-count" class="text-[11px] text-on-surface-variant font-medium">0 personas seleccionadas</span>
+                            </div>
+                            <div class="border border-outline-variant rounded-lg overflow-hidden">
+                                <div class="bg-surface-container-low px-2 py-1 border-b border-outline-variant flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[18px] text-outline">search</span>
+                                    <input id="filter-approvers" class="bg-transparent border-none focus:ring-0 w-full text-[13px] py-1" placeholder="Buscar por nombre o área..." type="text">
+                                </div>
+                                <div class="max-h-[200px] overflow-y-auto custom-scrollbar p-1 space-y-1 bg-surface-container-lowest">
+                                    {% for aprobador in lista_aprobadores %}
+                                        {% set partes = aprobador.nombreCompleto|split(' ') %}
+                                        {% set iniciales = partes|first|slice(0, 1) ~ (partes|length > 1 ? partes|last|slice(0, 1) : '') %}
+                                        
+                                        {% set is_checked = aprobador.id in aprobadores_ids %}
+                                        {% set checked_class = is_checked ? 'bg-primary/5 border-primary/20' : 'border-transparent' %}
+                                        
+                                        <label class="approver-label flex items-center justify-between p-2 rounded-lg hover:bg-primary/5 {{ checked_class }} transition-colors cursor-pointer group" data-area="{{ aprobador.area|lower }}" data-name="{{ aprobador.nombreCompleto|lower }}">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded-full bg-surface-container-low border border-primary/20 flex items-center justify-center text-primary font-bold text-[10px] uppercase">
+                                                    {{ iniciales }}
+                                                </div>
+                                                <div>
+                                                    <p class="text-[14px] text-on-surface font-medium">{{ aprobador.nombreCompleto }}</p>
+                                                    <p class="text-[11px] text-on-surface-variant">{{ aprobador.area }}</p>
+                                                </div>
+                                            </div>
+                                            <input type="checkbox" name="aprobadores[]" value="{{ aprobador.id }}" class="approver-checkbox w-5 h-5 rounded text-primary focus:ring-primary border-outline-variant" {% if is_checked %}checked{% endif %}>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="h-[1px] bg-outline-variant my-6"></div>
+
+                        <!-- Submit Button -->
+                        <button class="w-full h-[56px] bg-primary hover:bg-primary-container text-on-primary rounded-xl text-[16px] font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all duration-200 active:scale-[0.98]" type="submit">
+                            <span class="material-symbols-outlined">save</span>
+                            Guardar Cambios
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-resize textarea
+            const razonCambio = document.getElementById('razon_cambio');
+            if (razonCambio) {
+                razonCambio.style.height = razonCambio.scrollHeight + 'px';
+                razonCambio.addEventListener('input', function () {
+                    this.style.height = 'auto';
+                    this.style.height = this.scrollHeight + 'px';
+                });
+            }
+
+            // Mostrar archivo seleccionado o conservar original
+            const fileInput = document.getElementById('documento_file_input');
+            const fileNameText = document.getElementById('file-name');
+            const fileInfoText = document.getElementById('file-info');
+            const fileIcon = document.getElementById('file-icon');
+            const container = document.getElementById('dropzone-container');
+            const removeBtn = document.getElementById('remove-file-btn');
+            
+            if (fileInput && fileNameText && container) {
+                const originalName = fileNameText.textContent;
+                const originalInfo = fileInfoText.textContent;
+
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        fileNameText.textContent = 'Nuevo archivo: ' + file.name;
+                        fileInfoText.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+                        if (fileIcon) fileIcon.textContent = 'article'; 
+                        fileNameText.classList.replace('text-on-surface', 'text-green-700');
+                        container.classList.remove('border-outline-variant', 'bg-surface-container-low');
+                        container.classList.add('border-green-500', 'bg-green-50/30');
+                        removeBtn.classList.remove('hidden');
+                        fileInput.classList.add('w-[calc(100%-60px)]');
+                    } else { resetUploadSlot(); }
+                });
+
+                removeBtn.addEventListener('click', (e) => {
+                    e.preventDefault(); fileInput.value = ''; resetUploadSlot();
+                });
+
+                function resetUploadSlot() {
+                    fileNameText.textContent = originalName; fileInfoText.textContent = originalInfo;
+                    if (fileIcon) fileIcon.textContent = 'description';
+                    fileNameText.classList.replace('text-green-700', 'text-on-surface');
+                    container.classList.add('border-outline-variant', 'bg-surface-container-low');
+                    container.classList.remove('border-green-500', 'bg-green-50/30');
+                    removeBtn.classList.add('hidden');
+                    fileInput.classList.remove('w-[calc(100%-60px)]');
+                }
+            }
+
+            // Selector de Aprobadores y contador
+            const approverLabels = document.querySelectorAll('.approver-label');
+            const approverCheckboxes = document.querySelectorAll('.approver-checkbox');
+            const filterApproversInput = document.getElementById('filter-approvers');
+
+            function updateCounts() {
+                const count = Array.from(approverCheckboxes).filter(cb => cb.checked).length;
+                document.getElementById('approvers-count').textContent = `${count} ${count === 1 ? 'persona seleccionada' : 'personas seleccionadas'}`;
+            }
+            
+            approverCheckboxes.forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    const label = e.target.closest('.approver-label');
+                    if (label) {
+                        if (e.target.checked) {
+                            label.classList.add('bg-primary/5', 'border-primary/20'); label.classList.remove('border-transparent');
+                        } else {
+                            label.classList.remove('bg-primary/5', 'border-primary/20'); label.classList.add('border-transparent');
+                        }
+                    }
+                    updateCounts();
+                });
+            });
+            
+            approverLabels.forEach(label => {
+                label.addEventListener('click', (e) => {
+                    if (e.target.type !== 'checkbox') {
+                        e.preventDefault(); const cb = label.querySelector('.approver-checkbox');
+                        if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }
+                    }
+                });
+            });
+
+            if (filterApproversInput) {
+                filterApproversInput.addEventListener('input', () => {
+                    const searchText = filterApproversInput.value.trim().toLowerCase();
+                    approverLabels.forEach(label => {
+                        const areaAttr = (label.dataset.area || '').toLowerCase(); const nameAttr = (label.dataset.name || '').toLowerCase();
+                        label.style.setProperty('display', (searchText === '' || nameAttr.includes(searchText) || areaAttr.includes(searchText)) ? 'flex' : 'none', 'important');
+                    });
+                });
+            }
+            updateCounts();
+        });
+    </script>
+{% endblock %}
