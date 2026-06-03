@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Nueva Solicitud DCR</title>
+</head>
+<body style="font-family: Arial, sans-serif; color: #333; background-color: #f4f7f9; padding: 20px;">
+    <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; border-top: 5px solid #007bc0; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h2 style="color: #007bc0; margin-top: 0;">Nueva Solicitud Asignada</h2>
+        <p>Hola,</p>
+        <p>Se te ha asignado una nueva solicitud de <strong>Document Change Request (DCR)</strong> para tu revisión.</p>
+        
+        <ul style="background-color: #f8f9fa; padding: 15px 15px 15px 35px; border-radius: 5px;">
+            <li><strong>Documento:</strong> {{ solicitud.nombreDocumento }}</li>
+            <li><strong>Revisión:</strong> {{ solicitud.numeroRevision }}</li>
+            <li><strong>Razón del cambio:</strong> {{ solicitud.razonCambio }}</li>
+        </ul>
+        
+        <p style="margin-top: 20px;">Por favor, ingresa a la plataforma para emitir tu dictamen antes de la fecha límite.</p>
+    </div>
+</body>
+</html>

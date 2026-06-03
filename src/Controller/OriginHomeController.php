@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\EmailNotificationService;
 
 final class OriginHomeController extends AbstractController
 {
@@ -25,7 +26,7 @@ final class OriginHomeController extends AbstractController
     }
 
     #[Route('/origin/nuevo', name: 'app_origin_nuevo')]
-    public function nuevo(Request $request, EntityManagerInterface $entityManager): Response
+    public function nuevo(Request $request, EntityManagerInterface $entityManager, EmailNotificationService $emailService): Response
     {
         // 1. OBTENER LA LISTA DE APROBADORES PARA EL SELECTOR
         // Buscamos usuarios que tengan ROLE_APROBADOR
@@ -88,7 +89,11 @@ final class OriginHomeController extends AbstractController
             $entityManager->persist($solicitud);
 
             // 2. REGISTRAR LOS APROBADORES SELECCIONADOS
-            $idsAprobadores = $request->request->all('aprobadores'); // Obtenemos el array del select
+            $idsAprobadores = $request->request->all('aprobadores');
+            
+            if (!is_array($idsAprobadores)) {
+                $idsAprobadores = [];
+            }
 
             foreach ($idsAprobadores as $idAprobador) {
                 $userAprobador = $entityManager->getRepository(User::class)->find($idAprobador);
@@ -109,6 +114,13 @@ final class OriginHomeController extends AbstractController
             }
 
             $entityManager->flush();
+
+            // 3. ENVIAR CORREOS A LOS APROBADORES
+            try {
+                $emailService->enviarNotificacionNuevaSolicitud($solicitud);
+            } catch (\Exception $e) {
+                // Si Outlook falla temporalmente bloqueando la conexión, evitamos que la aplicación crashee
+            }
 
             // Agregamos el mensaje flash que detectará el JavaScript
             $this->addFlash('registro_exitoso', 'Tu solicitud DCR ha sido enviada correctamente.');

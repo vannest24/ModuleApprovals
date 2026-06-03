@@ -36,11 +36,27 @@ final class ApprovalHomeController extends AbstractController
                         $aprobacion->setEstatus(Status::APROBADA);
                     } else {
                         $aprobacion->setEstatus(Status::RECHAZADA);
-                        $solicitud->setEstatus(Estatus::RECHAZADA);
                     }
                     $aprobacion->setFechaRespuesta(new \DateTimeImmutable());
                     $aprobacion->setComentarios($request->request->get('comentarios', 'Sin comentarios.'));
                     
+                    // Recalcular el estatus general de la solicitud
+                    $todasAprobaciones = $entityManager->getRepository(Aprobaciones::class)->findBy(['solicitud' => $solicitud]);
+                    $todasRespondidas = true;
+                    $algunRechazo = false;
+
+                    foreach ($todasAprobaciones as $ap) {
+                        if ($ap->getEstatus() === Status::PENDIENTE) {
+                            $todasRespondidas = false;
+                        } elseif ($ap->getEstatus() === Status::RECHAZADA) {
+                            $algunRechazo = true;
+                        }
+                    }
+
+                    if ($todasRespondidas) {
+                        $solicitud->setEstatus($algunRechazo ? Estatus::RECHAZADA : Estatus::APROBADA);
+                    }
+
                     $entityManager->flush();
                     $this->addFlash('success', 'Respuesta registrada correctamente.');
                 }
@@ -74,11 +90,37 @@ final class ApprovalHomeController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $accion = $request->request->get('accion');
+            $user = $this->getUser();
             
-            if ($accion === 'aprobar') {
-                $solicitud->setEstatus(Estatus::APROBADA); 
-            } elseif ($accion === 'rechazar') {
-                $solicitud->setEstatus(Estatus::RECHAZADA);
+            $aprobacion = $entityManager->getRepository(Aprobaciones::class)->findOneBy([
+                'solicitud' => $solicitud,
+                'aprobador' => $user
+            ]);
+
+            if ($aprobacion) {
+                if ($accion === 'aprobar') {
+                    $aprobacion->setEstatus(Status::APROBADA);
+                } else {
+                    $aprobacion->setEstatus(Status::RECHAZADA);
+                }
+                $aprobacion->setFechaRespuesta(new \DateTimeImmutable());
+                $aprobacion->setComentarios($request->request->get('comentarios', 'Sin comentarios.'));
+            }
+
+            $todasAprobaciones = $entityManager->getRepository(Aprobaciones::class)->findBy(['solicitud' => $solicitud]);
+            $todasRespondidas = true;
+            $algunRechazo = false;
+
+            foreach ($todasAprobaciones as $ap) {
+                if ($ap->getEstatus() === Status::PENDIENTE) {
+                    $todasRespondidas = false;
+                } elseif ($ap->getEstatus() === Status::RECHAZADA) {
+                    $algunRechazo = true;
+                }
+            }
+
+            if ($todasRespondidas) {
+                $solicitud->setEstatus($algunRechazo ? Estatus::RECHAZADA : Estatus::APROBADA);
             }
 
             $entityManager->flush();

@@ -29,10 +29,7 @@ class CreateUserCommand extends Command
     {
         // Datos: [Email, Roles, Nombre Completo, Nombre del Área]
         $datos = [
-            ['originador@harman.com', ['ROLE_ORIGINADOR'], 'Originador AMEF', 'AMEF'],
-            ['lanzamientos@harman.com', ['ROLE_APROBADOR'], 'Aprobador Lanzamientos', 'Lanzamientos'],
-            ['calidad@harman.com', ['ROLE_APROBADOR'], 'Aprobador Calidad', 'Calidad'],
-            ['produccion@harman.com', ['ROLE_APROBADOR'], 'Aprobador Produccion', 'Produccion'],
+            ['vanessasotoh24@gmail.com', ['ROLE_APROBADOR'], 'Aprobador Ingenieria', 'Ingenieria'],
         ];
 
         $areaRepo = $this->entityManager->getRepository(Area::class);

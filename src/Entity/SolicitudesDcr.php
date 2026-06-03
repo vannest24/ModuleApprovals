@@ -52,7 +52,7 @@ class SolicitudesDcr
         #[ORM\OneToOne(inversedBy: 'solicitudesDcr', cascade: ['persist', 'remove'])]
         private ?Documento $idDocumento = null;
 
-        #[ORM\Column(length: 255)]
+        #[ORM\Column(type: 'text', nullable: true)]
         private ?string $razon_cambio = null;
 
         public function __construct()
