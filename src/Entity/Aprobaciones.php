@@ -21,7 +21,7 @@ class Aprobaciones
         #[ORM\Column(nullable: true)] // Agrega nullable: true
         private ?\DateTimeImmutable $fecha_respuesta = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $comentarios = null;
 
     #[ORM\ManyToOne(inversedBy: 'aprobaciones')]
