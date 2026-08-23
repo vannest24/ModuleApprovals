@@ -1,25 +1,18 @@
 {
   "name": "Symfony Project",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "image": "mcr.microsoft.com/devcontainers/base:jammy",
   "features": {
-    "ghcr.io/shyim/devcontainers-features/symfony-cli:0": {},
-    "ghcr.io/shyim/devcontainers-features/php:0": {
+    "ghcr.io/shyim/devcontainers-features/symfony-cli:latest": {},
+    "ghcr.io/shyim/devcontainers-features/php:latest": {
       "version": "8.4"
     }
   },
-  // Corregido: Se usa un string simple. Si no hay composer.json aún, esto fallará, 
-  // pero "|| true" evita que el contenedor se detenga.
   "updateContentCommand": "composer install || true",
-
-  // Corregido: No puedes poner múltiples comandos en un objeto aquí.
-  // Además, el servidor y el sass deben correr de fondo.
   "postAttachCommand": "symfony server:start -d && php bin/console sass:build --watch > /dev/null 2>&1 &",
-
   "containerEnv": {
     "SYMFONY_TRUSTED_PROXIES": "127.0.0.1",
     "SYMFONY_TRUSTED_HEADERS": "x-forwarded-for,x-forwarded-host,x-forwarded-proto,x-forwarded-port"
   },
-  
   "customizations": {
     "vscode": {
       "extensions": [
